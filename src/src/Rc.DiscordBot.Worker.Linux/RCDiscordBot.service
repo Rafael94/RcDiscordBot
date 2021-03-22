@@ -1,0 +1,18 @@
+﻿[Unit]
+Description=RC Discord Bot
+
+[Service]
+Type=notify
+# will set the Current Working Directory (CWD). Worker service will have issues without this setting
+WorkingDirectory=/usr/sbin/RCDiscordBot/
+# systemd will run this executable to start the service
+ExecStart=/usr/sbin/RCDiscordBot/RCDiscordBot
+SyslogIdentifier=RCDiscordBot
+
+# ensure the service restarts after crashing
+Restart=always
+# amount of time to wait before restarting the service              
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

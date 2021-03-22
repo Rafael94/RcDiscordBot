@@ -14,7 +14,9 @@ namespace Rc.DiscordBot.Services
         private readonly BotConfig _botConfig;
         private readonly DiscordSocketClient _client;
 
-        public DiscordService(IOptions<BotConfig> botConfigOptions, DiscordSocketClient client)
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Nicht verwendete Parameter entfernen", Justification = "<Ausstehend>")]
+        public DiscordService(IOptions<BotConfig> botConfigOptions, DiscordSocketClient client, CommandHandler commandHandler /* Wird benötigt, damit der Commandhandler initialisiert wird*/)
         {
             _botConfig = botConfigOptions.Value;
             _client = client;

@@ -6,6 +6,7 @@
     <RootNamespace>Rc.DiscordBot</RootNamespace>
     <Nullable>enable</Nullable>
     <AssemblyName>Rc.DiscordBot</AssemblyName>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

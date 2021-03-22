@@ -6,6 +6,7 @@
     <RootNamespace>Rc.DiscordBot</RootNamespace>
     <Nullable>enable</Nullable>
     <AssemblyName>RCDiscordBot</AssemblyName>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,12 +19,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Rc.DiscordBot.Worker.Core\Rc.DiscordBot.Worker.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="discordMusicBot.service">
+    <None Update="RCDiscordBot.service">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\PublishProfiles\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Rc.DiscordBot.Worker.Core\Rc.DiscordBot.Worker.Core.csproj" />
+  </ItemGroup>
+
 </Project>

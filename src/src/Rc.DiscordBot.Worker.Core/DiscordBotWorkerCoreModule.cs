@@ -23,7 +23,7 @@ namespace Rc.DiscordBot
 
                 commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotCoreModule))!).GetAwaiter().GetResult();
                 commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotAudioModule))!).GetAwaiter().GetResult();
-                commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotTwitchModule))!).GetAwaiter().GetResult();
+                //commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotTwitchModule))!).GetAwaiter().GetResult();
 
                 return commandHandler;
             });

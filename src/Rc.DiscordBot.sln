@@ -13,14 +13,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rc.DiscordBot.Worker.Linux"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F6AB0AC3-1567-4C1F-B5EE-0C38CC168782}"
 	ProjectSection(SolutionItems) = preProject
-		readme.md = readme.md
+		..\readme.md = ..\readme.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rc.DiscordBot.Worker.Core", "src\Rc.DiscordBot.Worker.Core\Rc.DiscordBot.Worker.Core.csproj", "{409ED835-0814-4B5E-A110-3A9006D7E3F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rc.DiscordBot.Audio", "src\Rc.DiscordBot.Audio\Rc.DiscordBot.Audio.csproj", "{4B419B9B-F03F-436F-9347-3165C131F504}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rc.DiscordBot.Audio", "src\Rc.DiscordBot.Audio\Rc.DiscordBot.Audio.csproj", "{4B419B9B-F03F-436F-9347-3165C131F504}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rc.DiscordBot.Twitch", "src\Rc.DiscordBot.Twitch\Rc.DiscordBot.Twitch.csproj", "{CDEEF77A-03E5-47D7-BF09-037CC8724668}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rc.DiscordBot.Twitch", "src\Rc.DiscordBot.Twitch\Rc.DiscordBot.Twitch.csproj", "{CDEEF77A-03E5-47D7-BF09-037CC8724668}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

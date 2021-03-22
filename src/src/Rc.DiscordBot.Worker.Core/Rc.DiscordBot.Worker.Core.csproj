@@ -4,7 +4,6 @@
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Rc.DiscordBot</RootNamespace>
     <Nullable>enable</Nullable>
-    <AssemblyName>RCDiscordBot</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

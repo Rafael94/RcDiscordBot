@@ -58,14 +58,13 @@ namespace Rc.DiscordBot.Services
 
             foreach (var stream in _audioConfig.Streams)
             {
-                var key = stream.Key;
-
-                if (string.IsNullOrEmpty(stream.Value.Name) == false)
+                var key = stream.Name;
+                if (string.IsNullOrEmpty(stream.DisplayName) == false)
                 {
-                    key = key + " - " + stream.Value.Name;
+                    key = key + " - " + stream.DisplayName;
                 }
 
-                builder.AddField(key, stream.Value.Url, false);
+                builder.AddField(key, stream.Url, false);
             }
 
             await context.Channel.SendMessageAsync("", false, builder.Build());
@@ -82,14 +81,24 @@ namespace Rc.DiscordBot.Services
             // Your task: Get a full path to the file if the value of 'path' is only a filename.
             if (!url.StartsWith("http"))
             {
-                if (_audioConfig.Streams.TryGetValue(url, out StreamConfig? stream) == false)
+                StreamConfig? audioStream = null;
+                for(var i = 0;i<_audioConfig.Streams.Count;i++)
+                {
+                    if(string.Equals(url, _audioConfig.Streams[i].Name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        audioStream = _audioConfig.Streams[i];
+                        break;
+                    }
+                }
+
+                if (audioStream == null)
                 {
                     await context.Channel.SendMessageAsync($"Stream with the Name {url} not found");
                     return;
                 }
 
-                await context.Channel.SendMessageAsync("Now Playing: " + (stream.Name ?? url));
-                await SendAsync(client, stream.Url, stream.Normalization, stream.Volume);
+                await context.Channel.SendMessageAsync("Now Playing: " + (audioStream.DisplayName ?? url));
+                await SendAsync(client, audioStream.Url, audioStream.Normalization, audioStream.Volume);
 
             }
             else if (string.IsNullOrWhiteSpace(volume) == false)
