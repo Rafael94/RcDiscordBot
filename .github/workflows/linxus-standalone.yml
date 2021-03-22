@@ -23,8 +23,20 @@ jobs:
       run: dotnet build src/Rc.DiscordBot.sln --no-restore
     - name: Test
       run: dotnet test src/Rc.DiscordBot.sln --no-build --verbosity normal
-    - name: Publish
-      run: dotnet publish src/src/Rc.DiscordBot.Worker.Linux/Rc.DiscordBot.Worker.Linux.csproj --self-contained true -p:PublishTrimmed=true -c release -o publish -r linux-x64 -p:PublishDir=.\linux-standalone
+    - name: Publish Linux Standalone
+      run: dotnet publish src/src/Rc.DiscordBot.Worker.Linux/Rc.DiscordBot.Worker.Linux.csproj --self-contained true -p:PublishTrimmed=true -c release -o publish -r linux-x64 -p:PublishDir=publish\linux-standalone
+    - name: Publish Linux
+      run: dotnet publish src/src/Rc.DiscordBot.Worker.Linux/Rc.DiscordBot.Worker.Linux.csproj --self-contained false -p:PublishTrimmed=true -c release -o publish -r linux-x64 -p:PublishDir=publish\linux
+    - name: Upload Linux Standalone Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Linux Standalone
+        path: /home/runner/work/DiscordBot/DiscordBot/src/src/Rc.DiscordBot.Worker.Linux/publish/linux-standalone/
+    - name: Upload Linux Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Linux
+        path: /home/runner/work/DiscordBot/DiscordBot/src/src/Rc.DiscordBot.Worker.Linux/publish/linux/
 
       
       
