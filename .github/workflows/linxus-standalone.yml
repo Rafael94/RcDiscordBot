@@ -18,11 +18,11 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Restore dependencies
-      run: dotnet restore DiscordBot/src/Rc.DiscordBot.sln
+      run: dotnet restore src/Rc.DiscordBot.sln
     - name: Build
-      run: dotnet build DiscordBot/src/Rc.DiscordBot.sln --no-restore
+      run: dotnet build src/Rc.DiscordBot.sln --no-restore
     - name: Test
-      run: dotnet test DiscordBot/src/Rc.DiscordBot.sln --no-build --verbosity normal
+      run: dotnet test src/Rc.DiscordBot.sln --no-build --verbosity normal
     - name: Publish
-      run: dotnet publish DiscordBot/src/src/Rc.DiscordBot.Worker.Linux/Rc.DiscordBot.Worker.Linux.csproj --self-contained true -p:PublishTrimmed=true --no-restore --no-build --runtime linux-x64 -c Release
+      run: dotnet publish src/src/Rc.DiscordBot.Worker.Linux/Rc.DiscordBot.Worker.Linux.csproj --self-contained true -p:PublishTrimmed=true --no-restore --no-build --runtime linux-x64 -c Release
       
