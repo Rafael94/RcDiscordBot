@@ -24,7 +24,7 @@ jobs:
     - name: Test
       run: dotnet test src/Rc.DiscordBot.sln --no-build --verbosity normal
     - name: Publish
-      run: dotnet publish src/src/Rc.DiscordBot.Worker.Linux/Rc.DiscordBot.Worker.Linux.csproj --self-contained true -p:PublishTrimmed=true --no-restore -c release -o publish -r linux-x64 -p:PublishDir=.\linux-standalone
+      run: dotnet publish src/src/Rc.DiscordBot.Worker.Linux/Rc.DiscordBot.Worker.Linux.csproj --self-contained true -p:PublishTrimmed=true -c release -o publish -r linux-x64 -p:PublishDir=.\linux-standalone
 
       
       
