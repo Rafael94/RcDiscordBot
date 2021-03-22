@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Rc.DiscordBot</RootNamespace>
+    <Nullable>enable</Nullable>
+    <AssemblyName>RCDiscordBot</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Rc.DiscordBot.Audio\Rc.DiscordBot.Audio.csproj" />
+    <ProjectReference Include="..\Rc.DiscordBot.Twitch\Rc.DiscordBot.Twitch.csproj" />
+  </ItemGroup>
+
+</Project>

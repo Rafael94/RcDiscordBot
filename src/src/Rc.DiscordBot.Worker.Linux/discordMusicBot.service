@@ -1,0 +1,9 @@
+﻿[Unit]
+Description=Discord Music Bot
+
+[Service]
+Type=notify
+ExecStart=/usr/sbin/DiscordMusicBot/DiscordMusicBot
+
+[Install]
+WantedBy=multi-user.target

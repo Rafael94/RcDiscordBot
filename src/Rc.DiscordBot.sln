@@ -1,0 +1,70 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C51063DB-5083-4D83-BE73-A90129C33C09}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rc.DiscordBot.Worker.Windows", "src\Rc.DiscordBot.Worker.Windows\Rc.DiscordBot.Worker.Windows.csproj", "{E9C41401-7BB9-47AC-8FE9-9B920CB86692}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rc.DiscordBot.Core", "src\Rc.DiscordBot.Core\Rc.DiscordBot.Core.csproj", "{923556C1-C1F9-4473-B083-13926A64E658}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rc.DiscordBot.Worker.Linux", "src\Rc.DiscordBot.Worker.Linux\Rc.DiscordBot.Worker.Linux.csproj", "{5ED88681-7A68-492F-BF6D-E12524236B6A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F6AB0AC3-1567-4C1F-B5EE-0C38CC168782}"
+	ProjectSection(SolutionItems) = preProject
+		readme.md = readme.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rc.DiscordBot.Worker.Core", "src\Rc.DiscordBot.Worker.Core\Rc.DiscordBot.Worker.Core.csproj", "{409ED835-0814-4B5E-A110-3A9006D7E3F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rc.DiscordBot.Audio", "src\Rc.DiscordBot.Audio\Rc.DiscordBot.Audio.csproj", "{4B419B9B-F03F-436F-9347-3165C131F504}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rc.DiscordBot.Twitch", "src\Rc.DiscordBot.Twitch\Rc.DiscordBot.Twitch.csproj", "{CDEEF77A-03E5-47D7-BF09-037CC8724668}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E9C41401-7BB9-47AC-8FE9-9B920CB86692}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9C41401-7BB9-47AC-8FE9-9B920CB86692}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9C41401-7BB9-47AC-8FE9-9B920CB86692}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9C41401-7BB9-47AC-8FE9-9B920CB86692}.Release|Any CPU.Build.0 = Release|Any CPU
+		{923556C1-C1F9-4473-B083-13926A64E658}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{923556C1-C1F9-4473-B083-13926A64E658}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{923556C1-C1F9-4473-B083-13926A64E658}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{923556C1-C1F9-4473-B083-13926A64E658}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5ED88681-7A68-492F-BF6D-E12524236B6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ED88681-7A68-492F-BF6D-E12524236B6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5ED88681-7A68-492F-BF6D-E12524236B6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5ED88681-7A68-492F-BF6D-E12524236B6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{409ED835-0814-4B5E-A110-3A9006D7E3F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{409ED835-0814-4B5E-A110-3A9006D7E3F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{409ED835-0814-4B5E-A110-3A9006D7E3F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{409ED835-0814-4B5E-A110-3A9006D7E3F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B419B9B-F03F-436F-9347-3165C131F504}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B419B9B-F03F-436F-9347-3165C131F504}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B419B9B-F03F-436F-9347-3165C131F504}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B419B9B-F03F-436F-9347-3165C131F504}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDEEF77A-03E5-47D7-BF09-037CC8724668}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDEEF77A-03E5-47D7-BF09-037CC8724668}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDEEF77A-03E5-47D7-BF09-037CC8724668}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDEEF77A-03E5-47D7-BF09-037CC8724668}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E9C41401-7BB9-47AC-8FE9-9B920CB86692} = {C51063DB-5083-4D83-BE73-A90129C33C09}
+		{923556C1-C1F9-4473-B083-13926A64E658} = {C51063DB-5083-4D83-BE73-A90129C33C09}
+		{5ED88681-7A68-492F-BF6D-E12524236B6A} = {C51063DB-5083-4D83-BE73-A90129C33C09}
+		{409ED835-0814-4B5E-A110-3A9006D7E3F1} = {C51063DB-5083-4D83-BE73-A90129C33C09}
+		{4B419B9B-F03F-436F-9347-3165C131F504} = {C51063DB-5083-4D83-BE73-A90129C33C09}
+		{CDEEF77A-03E5-47D7-BF09-037CC8724668} = {C51063DB-5083-4D83-BE73-A90129C33C09}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F7E4A7A2-9E79-4334-9470-31CE6CD26269}
+	EndGlobalSection
+EndGlobal
