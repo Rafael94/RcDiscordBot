@@ -39,7 +39,7 @@ jobs:
         path: /home/runner/work/DiscordBot/DiscordBot/src/src/Rc.DiscordBot.Worker.Linux/publish/linux-x64/
    # Windows x64 Standalone
     - name: Publish Windows x64 Standalone
-      run: dotnet publish src/src/Rc.DiscordBot.Worker.Linux/Rc.DiscordBot.Worker.Windows.csproj --self-contained true -p:PublishTrimmed=true -c release -o publish -r win-x64 -p:PublishDir=publish\windows-x64-standalone
+      run: dotnet publish src/src/Rc.DiscordBot.Worker.Windows/Rc.DiscordBot.Worker.Windows.csproj --self-contained true -p:PublishTrimmed=true -c release -o publish -r win-x64 -p:PublishDir=publish\windows-x64-standalone
     - name: Upload Windows x64 Standalone Build Artifact
       uses: actions/upload-artifact@v2
       with:
@@ -47,7 +47,7 @@ jobs:
         path: /home/runner/work/DiscordBot/DiscordBot/src/src/Rc.DiscordBot.Worker.Windows/publish/windows-x64-standalone/  
     # Windows x64
     - name: Publish Windows x64
-      run: dotnet publish src/src/Rc.DiscordBot.Worker.Linux/Rc.DiscordBot.Worker.Windows.csproj --self-contained false -c release -o publish -r win-x64 -p:PublishDir=publish\windows-x64
+      run: dotnet publish src/src/Rc.DiscordBot.Worker.Windows/Rc.DiscordBot.Worker.Windows.csproj --self-contained false -c release -o publish -r win-x64 -p:PublishDir=publish\windows-x64
     - name: Upload Windows x64 Standalone Build Artifact
       uses: actions/upload-artifact@v2
       with:
