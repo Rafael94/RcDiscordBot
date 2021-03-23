@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Rc.DiscordBot.Core\Rc.DiscordBot.Core.csproj" />
+    <PackageReference Include="Victoria" Version="5.1.8" />
   </ItemGroup>
 
 </Project>

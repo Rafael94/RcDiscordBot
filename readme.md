@@ -26,13 +26,14 @@ der vorhandenen Dateien gelöscht werden.
 
 In dieser Datei werden unteranderem die Api Keys für Discord und Twitch (optional) hinterlegt.
 
+### LavaLink
+
+Für das Abspielen der Lieder wird [Lavalink](https://github.com/Frederikam/Lavalink) verwenden. Dieses muss auf dem Server installiert werden. Dafür ist eine Java Runtime notwendig.
+
+Lavalink kann ebenfalls als Service angelegt werden. https://dzone.com/articles/run-your-java-application-as-a-service-on-ubuntu
+
+
 ### Linux (Systemd)
-
-#### Ubuntu
-
-`sudo apt-get install -y libopus-dev libopus0 opus-tools libsodium-dev ffmpeg`
-
-#### Alle Distributionen
 
 Nachdem die Abhängikeiten installiert worden sind, kann die Bot an sich installiert werden. Das Linux Archive entpacken, z.B unter `/usr/sbin/RCDiscordBot/` 
 und die `RCDiscordBot.service` (befindet sich ebenfalls im Archive) nach `/etc/systemd/system/` verschieben. Falls ein anderer Ordner verwendet wird, muss der Pfad noch angepasst werden.

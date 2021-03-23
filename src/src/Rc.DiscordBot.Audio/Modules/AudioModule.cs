@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using Rc.DiscordBot.Services;
 using System.Threading.Tasks;
 
@@ -8,51 +9,69 @@ namespace Rc.DiscordBot.Modules
     [Name("Audio")]
     public class AudioModule : ModuleBase<SocketCommandContext>
     {
-        private readonly AudioService _audioService;
+        private readonly LavaLinkAudio _audioService;
 
-        public AudioModule(AudioService audioService)
+        public AudioModule(LavaLinkAudio lavaLinkAudio)
         {
-            _audioService = audioService;
+            _audioService = lavaLinkAudio;
         }
 
-        [Command("Join", RunMode = RunMode.Async)]
+        [Command("Join")]
         [Summary("Den Bot zum aktuellen Channel")]
-        public async Task JoinCmd(IVoiceChannel? channel = null)
-        {
-            // Get the audio channel
-            channel ??= (Context.User as IGuildUser)?.VoiceChannel;
-            if (channel == null)
-            {
-                await ReplyAsync("User must be in a voice channel, or a voice channel must be passed as an argument.");
-                return;
-            }
+        public async Task JoinAndPlay()
+            => await ReplyAsync(embed: await _audioService.JoinAsync(Context.Guild, (Context.User as IVoiceState)!, (Context.Channel as ITextChannel)!));
 
-            await _audioService.JoinAudio(Context.Guild, channel);
-        }
+        [Command("Leave")]
+        public async Task Leave()
+                 => await ReplyAsync(embed: await _audioService.LeaveAsync(Context.Guild));
 
-        // Remember to add preconditions to your commands,
-        // this is merely the minimal amount necessary.
-        // Adding more commands of your own is also encouraged.
-        [Command("Leave", RunMode = RunMode.Async)]
-        [Alias("Stop")]
-        [Summary("Stopt die Musik und der Bot wird aus dem Channel entfernt")]
-        public async Task LeaveCmd()
-        {
-            await _audioService.LeaveAudioAsync(Context.Guild);
-        }
 
-        [Command("PlayStream", RunMode = RunMode.Async)]
-        [Summary("Spielt den übergebenen Stream ab")]
-        public async Task PlayCmd([Summary("Einen im Bot hinterlegtem Stream (ListStreams) oder einen Stream")] string streamUrlOrStreamName, [Summary("Zahl{db}(ENG Format), Loudnorm, Dynaudnorm")] string? volume = null)
-        {
-            await _audioService.PlayStreamAsync(Context, streamUrlOrStreamName, volume);
-        }
+        [Command("Play")]
+        public async Task Play([Remainder] string search)
+            => await ReplyAsync(embed: await _audioService.PlayAsync(Context.User as SocketGuildUser, Context.Guild, search));
 
-        [Command("ListStreams", RunMode = RunMode.Async)]
-        public async Task ListStreamsCmd()
-        {
-            await _audioService.PrintAvailableStreamsAsync(Context);
-        }
+        [Command("SC"), Alias("SoundCloud"), Summary("Such den Track in SoundCloud")]
+        public async Task PlaySoundCloud([Remainder] string search)
+           => await ReplyAsync(embed: await _audioService.PlayAsync(Context.User as SocketGuildUser, Context.Guild, search, LavaLinkAudio.FallbackSearch.SoundCloud));
 
+        [Command("Stop")]
+        public async Task Stop()
+            => await ReplyAsync(embed: await _audioService.StopAsync(Context.Guild));
+
+        [Command("List")]
+        public async Task List()
+            => await ReplyAsync(embed: await _audioService.ListAsync(Context.Guild));
+
+        [Command("Skip")]
+        public async Task Skip()
+            => await ReplyAsync(embed: await _audioService.SkipTrackAsync(Context.Guild));
+
+        [Command("Volume")]
+        public async Task Volume(int volume)
+            => await ReplyAsync(await _audioService.SetVolumeAsync(Context.Guild, volume));
+
+        [Command("Pause")]
+        public async Task Pause()
+            => await ReplyAsync(await _audioService.PauseAsync(Context.Guild));
+
+        [Command("Resume")]
+        public async Task Resume()
+            => await ReplyAsync(await _audioService.ResumeAsync(Context.Guild));
+
+        [Command("ListStreams")]
+        public async Task ListStreams()
+           => await ReplyAsync(embed: await _audioService.ListAvailableStreamsAsync());
+
+        [Command("Stream")]
+        public async Task PlayStream(string stream)
+          => await ReplyAsync(embed: await _audioService.PlayStreamAsync(Context.User as SocketGuildUser, Context.Guild, stream));
+
+        [Command("ClearPlaylist")]
+        public async Task ClearPlaylist()
+          => await ReplyAsync(embed: await _audioService.ClearPlaylistAsync(Context.Guild));
+
+        [Command("Genius", RunMode = RunMode.Async)]
+        public async Task Genius()
+          => await ReplyAsync(embed: await _audioService.ShowGeniusLyrics(Context.Guild));
     }
 }
