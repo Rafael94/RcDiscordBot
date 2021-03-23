@@ -7,9 +7,17 @@ Funktionen
 
 ## Installation
 
-### Bot Anlegen
+### API Daten generieren
+
+#### Discord
 
 https://docs.stillu.cc/guides/getting_started/first-bot.html
+
+#### Twitch
+
+https://dev.twitch.tv/console/apps
+
+URL: http://localhost
 
 ### Einstellungen
 
@@ -42,7 +50,8 @@ sudo systemctl enable RCDiscordBot.service
 
 ### Windows
 
-Für Window muss nur das Archive entpackt werden. Die Runtime ist bereits enthalten. Der Bot kann entweder durch `DiscordMusicBot.Service.exe` gestartet werden
+Für Window muss nur das Archive entpackt werden. Die Runtime ist bereits enthalten. Der Bot kann entweder durch `DiscordMusicBot.Service.exe` gestartet werden. Der Bot
+ kann mit `sc.exe create RCDiscordBot binpath="c:\xxx\Rc.DiscordBot.exe"` als Service installiert werden.
 
 # Befehle
 
