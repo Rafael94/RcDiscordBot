@@ -1,6 +1,7 @@
 ﻿using Discord;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Rc.DiscordBot.Handlers
@@ -55,7 +56,12 @@ namespace Rc.DiscordBot.Handlers
                 return embedBuilder;
             }
 
-            description = description.Replace("<br>", Environment.NewLine, StringComparison.OrdinalIgnoreCase).Replace("<br/>", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
+            description = description.Replace("<br>", Environment.NewLine, StringComparison.OrdinalIgnoreCase)
+                .Replace("<br/>", Environment.NewLine, StringComparison.OrdinalIgnoreCase)
+                .Replace("<li>", "", StringComparison.OrdinalIgnoreCase)
+                .Replace("<li/>", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
+
+            description = Regex.Replace(description, "<.*?>", String.Empty);
 
             if (description.Length > 2048)
             {

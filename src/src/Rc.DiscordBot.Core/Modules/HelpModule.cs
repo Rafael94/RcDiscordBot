@@ -49,7 +49,7 @@ namespace Rc.DiscordBot.Modules
 
                         if (cmd.Parameters.Count > 0)
                         {
-                            description += ' ' + string.Join(' ', cmd.Parameters.Select(x => $"{x.Name}{(x.IsOptional ? '?' : "")}:{x.Type.Name}").ToList());
+                            description += ' ' + string.Join(' ', cmd.Parameters.Select(x => $"{x.Name}{(x.IsOptional ? '?' : "")}").ToList());
                         }
 
                         if (cmd.Aliases.Count > 1)
@@ -113,7 +113,7 @@ namespace Rc.DiscordBot.Modules
 
                     foreach (Discord.Commands.ParameterInfo? para in cmd.Parameters)
                     {
-                        x.Value += $"{para.Name}{(para.IsOptional ? '?' : "")}:{para.Type.Name} {para.Summary}\n";
+                        x.Value += $"{para.Name}{(para.IsOptional ? '?' : "")} {para.Summary}\n";
                     }
 
                     x.IsInline = false;

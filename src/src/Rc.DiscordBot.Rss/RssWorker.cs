@@ -76,19 +76,9 @@ namespace Rc.DiscordBot
 
         private async Task SendMessageAsync(Models.Feed feedConfig, FeedItem feedItem)
         {
-            await _discordService.SendMessageAsync(feedConfig.DiscordServers, embed: CreateEmbed(feedConfig.Name, feedItem));
+            await _discordService.SendMessageAsync(feedConfig.DiscordServers, embed: RssEmbedHelper.CreateEmbed(feedConfig.Name, feedItem));
         }
 
-        private static Embed CreateEmbed(string feedName, FeedItem item)
-        {
-            return new EmbedBuilder()
-                               .WithTitle($"RSS - {feedName}: {item.Title}")
-                               .WithCustomDescription(item.Description)
-                               .WithUrl(item.Link)
-                               .WithAuthor(item.Author)
-                               .WithColor(Color.Blue)
-                               .WithBotFooter()
-                               .Build();
-        }
+       
     }
 }
