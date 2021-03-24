@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
-
+  <Import Project="..\..\common.props" />
+  <Import Project="..\..\configureawait.props" />
+  
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>dotnet-DiscordMusicBot.Worker.Windows-3E1B0412-17B8-4204-8D2E-DAE0B74EB511</UserSecretsId>
     <RootNamespace>Rc.DiscordBot</RootNamespace>
-    <Nullable>enable</Nullable>
     <AssemblyName>Rc.DiscordBot</AssemblyName>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -18,12 +19,4 @@
     <ProjectReference Include="..\Rc.DiscordBot.Worker.Core\Rc.DiscordBot.Worker.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="ffmpeg.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="libsodium.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 </Project>

@@ -57,9 +57,10 @@ namespace Rc.DiscordBot.Services
 
         /*Used whenever we want to log something to the Console. 
             Todo: Hook in a Custom LoggingService. */
-        private async Task LogAsync(LogMessage logMessage)
+        private  Task LogAsync(LogMessage logMessage)
         {
             //await LoggingService.LogAsync(logMessage.Source, logMessage.Severity, logMessage.Message);
+            return Task.CompletedTask;
         }
     }
 }

@@ -1,0 +1,23 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Authors>Rafael Carnucci</Authors>
+    <Version>0.0.1</Version>
+    <Copyright>2020</Copyright> 
+    <RepositoryUrl>https://github.com/Rafael94/DiscordBot</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Nullable>enable</Nullable>
+    <!--<GenerateDocumentationFile>true</GenerateDocumentationFile> -->
+
+    <!-- https://github.com/dotnet/sourcelink -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.0-beta-20204-02">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

@@ -12,7 +12,7 @@ namespace Rc.DiscordBot.Handlers
         public static Task<Embed> CreateBasicEmbed(string title,
             string description,
             Color color,
-            IEnumerable<EmbedFieldBuilder> fileds = null)
+            IEnumerable<EmbedFieldBuilder>? fileds = null)
         {
             var builder = new EmbedBuilder()
                 .WithTitle(title)

@@ -28,11 +28,11 @@ namespace Rc.DiscordBot.Modules
 
         [Command("Play")]
         public async Task Play([Remainder] string search)
-            => await ReplyAsync(embed: await _audioService.PlayAsync(Context.User as SocketGuildUser, Context.Guild, search));
+            => await ReplyAsync(embed: await _audioService.PlayAsync((Context.User as SocketGuildUser)!, Context.Guild, search));
 
         [Command("SC"), Alias("SoundCloud"), Summary("Such den Track in SoundCloud")]
         public async Task PlaySoundCloud([Remainder] string search)
-           => await ReplyAsync(embed: await _audioService.PlayAsync(Context.User as SocketGuildUser, Context.Guild, search, LavaLinkAudio.FallbackSearch.SoundCloud));
+           => await ReplyAsync(embed: await _audioService.PlayAsync((Context.User as SocketGuildUser)!, Context.Guild, search, LavaLinkAudio.FallbackSearch.SoundCloud));
 
         [Command("Stop")]
         public async Task Stop()
@@ -64,7 +64,7 @@ namespace Rc.DiscordBot.Modules
 
         [Command("Stream")]
         public async Task PlayStream(string stream)
-          => await ReplyAsync(embed: await _audioService.PlayStreamAsync(Context.User as SocketGuildUser, Context.Guild, stream));
+          => await ReplyAsync(embed: await _audioService.PlayStreamAsync((Context.User as SocketGuildUser)!, Context.Guild, stream));
 
         [Command("ClearPlaylist")]
         public async Task ClearPlaylist()

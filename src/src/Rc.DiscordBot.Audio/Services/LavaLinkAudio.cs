@@ -140,33 +140,33 @@ namespace Rc.DiscordBot.Services
 
                 //Get the first track from the search results.
                 //TODO: Add a 1-5 list for the user to pick from. (Like Fredboat)
-                LavaTrack? track = search.Tracks.FirstOrDefault();
 
-                if (track == null)
+                if (search.Tracks?.Count == 0)
                 {
                     return await EmbedHandler.CreateErrorEmbed("Music", $"I wasn't able to find the Stream.");
                 }
+                LavaTrack? track = search.Tracks?[0];
 
                 var isPlayList = string.IsNullOrWhiteSpace(search.Playlist.Name) == false;
 
                 void AddPlayList()
                 {
-                    for (var i = 1; i < search.Tracks.Count; i++)
+                    for (var i = 1; i < search.Tracks!.Count; i++)
                     {
                         player.Queue.Enqueue(search.Tracks[i]);
                     }
                 };
 
-                List<EmbedFieldBuilder> embeds = new()
+                List<EmbedFieldBuilder> fields = new()
                 {
                     new EmbedFieldBuilder().WithIsInline(true).WithName("Channel").WithValue(player.VoiceChannel.Name),
-                    new EmbedFieldBuilder().WithIsInline(true).WithName("Duration").WithValue(track.Duration.ToString(@"hh\:mm\:ss"))
+                    new EmbedFieldBuilder().WithIsInline(true).WithName("Duration").WithValue(track!.Duration.ToString(@"hh\:mm\:ss"))
                 };
 
                 if (isPlayList)
                 {
-                    embeds.Add(new EmbedFieldBuilder().WithIsInline(true).WithName("Playlist").WithValue("Yes"));
-                    embeds.Add(new EmbedFieldBuilder().WithIsInline(true).WithName("Tracks").WithValue(search.Tracks.Count()));
+                    fields.Add(new EmbedFieldBuilder().WithIsInline(true).WithName("Playlist").WithValue("Yes"));
+                    fields.Add(new EmbedFieldBuilder().WithIsInline(true).WithName("Tracks").WithValue(search.Tracks!.Count));
                 }
 
                 //If the Bot is already playing music, or if it is paused but still has music in the playlist, Add the requested track to the queue.
@@ -174,22 +174,22 @@ namespace Rc.DiscordBot.Services
                 {
                     var estimatedTime = player.Track!.Duration - player.Track.Position;
 
-                    foreach(var queuedTrack in player.Queue)
+                    foreach (var queuedTrack in player.Queue)
                     {
                         estimatedTime += ((LavaTrack)queuedTrack).Duration;
                     }
 
                     player.Queue.Enqueue(track);
 
-                    embeds.Add(new EmbedFieldBuilder().WithIsInline(true).WithName("Position in queue").WithValue(player.Queue.Count));
+                    fields.Add(new EmbedFieldBuilder().WithIsInline(true).WithName("Position in queue").WithValue(player.Queue.Count));
 
                     if (isPlayList)
                     {
-                        AddPlayList();                    
-                    } 
+                        AddPlayList();
+                    }
 
                     //await LoggingService.LogInformationAsync("Music", $"{track.Title} has been added to the music queue.");
-                    return await EmbedHandler.CreateBasicEmbed("Music", $"{track.Title} has been added to queue.", Color.Blue, embeds);
+                    return await EmbedHandler.CreateBasicEmbed("Music", $"{track.Title} has been added to queue.", Color.Blue, fields);
                 }
 
                 //Player was not playing anything, so lets play the requested track.
@@ -199,10 +199,10 @@ namespace Rc.DiscordBot.Services
                 {
                     AddPlayList();
                 }
-                
+
                 //await LoggingService.LogInformationAsync("Music", $"Bot Now Playing: {track.Title}\nUrl: {track.Url}");
 
-                return await EmbedHandler.CreateBasicEmbed("Music", $"Now Playing: {track.Title}\nUrl: {track.Url}", Color.Blue, embeds);
+                return await EmbedHandler.CreateBasicEmbed("Music", $"Now Playing: {track.Title}\nUrl: {track.Url}", Color.Blue, fields);
             }
 
             //If after all the checks we did, something still goes wrong. Tell the user about it so they can report it back to us.
@@ -267,12 +267,11 @@ namespace Rc.DiscordBot.Services
                 }
 
                 //Get the first track from the search results.
-                var track = search.Tracks.FirstOrDefault();
-
-                if (track == null)
+                if (search.Tracks?.Count == 0)
                 {
                     return await EmbedHandler.CreateErrorEmbed("Music", $"I wasn't able to find the Stream.");
                 }
+                LavaTrack? track = search.Tracks?[0];
 
                 //If the Bot is already playing music, or if it is paused but still has music in the playlist, Add the requested track to the queue.
                 if (player.Track != null && player.PlayerState is PlayerState.Playing || player.PlayerState is PlayerState.Paused)
@@ -280,13 +279,19 @@ namespace Rc.DiscordBot.Services
                     player.Queue.Enqueue(track);
 
                     //await LoggingService.LogInformationAsync("Music", $"{track.Title} has been added to the music queue.");
-                    return await EmbedHandler.CreateBasicEmbed("Music", $"{track.Title} has been added to queue.", Color.Blue);
+                    return await EmbedHandler.CreateBasicEmbed("Music", $"{track!.Title} has been added to queue.", Color.Blue);
                 }
 
                 //Player was not playing anything, so lets play the requested track.
                 await player.PlayAsync(track);
+
+                List<EmbedFieldBuilder> fields = new()
+                {
+                    new EmbedFieldBuilder().WithIsInline(true).WithName("Channel").WithValue(player.VoiceChannel.Name),
+                };
+
                 //await LoggingService.LogInformationAsync("Music", $"Bot Now Playing: {track.Title}\nUrl: {track.Url}");
-                return await EmbedHandler.CreateBasicEmbed("Music", $"Now Playing: {track.Title}\nUrl: {track.Url}", Color.Blue);
+                return await EmbedHandler.CreateBasicEmbed("Music", $"Now Playing: {track!.Title}\nUrl: {track.Url}", Color.Blue, fields);
             }
 
             //If after all the checks we did, something still goes wrong. Tell the user about it so they can report it back to us.
@@ -353,7 +358,7 @@ namespace Rc.DiscordBot.Services
                             descriptionBuilder.Append($"{trackNum}: [{track.Title}]({track.Url}) - {track.Id}\n");
                             trackNum++;
                         }
-                        return await EmbedHandler.CreateBasicEmbed("Music Playlist", $"Now Playing: [{player.Track.Title}]({player.Track.Url}) \n{descriptionBuilder}", Color.Blue);
+                        return await EmbedHandler.CreateBasicEmbed("Music Playlist", $"Now Playing: [{player.Track!.Title}]({player.Track.Url}) \n{descriptionBuilder}", Color.Blue);
                     }
                 }
                 else
@@ -521,7 +526,7 @@ namespace Rc.DiscordBot.Services
             }
         }
 
-        public async Task TrackEnded(TrackEndedEventArgs args)
+        public static async Task TrackEnded(TrackEndedEventArgs args)
         {
             if (!args.Reason.ShouldPlayNext())
             {
@@ -541,8 +546,16 @@ namespace Rc.DiscordBot.Services
             }
 
             await args.Player.PlayAsync(track);
+
+            List<EmbedFieldBuilder> fields = new()
+            {
+                new EmbedFieldBuilder().WithIsInline(true).WithName("Channel").WithValue(args.Player.VoiceChannel.Name),
+                new EmbedFieldBuilder().WithIsInline(true).WithName("Duration").WithValue(track.Duration.ToString(@"hh\:mm\:ss")),
+                new EmbedFieldBuilder().WithIsInline(true).WithName("Remaining Tracks in Playlist").WithValue(args.Player.Queue.Count),
+            };
+
             await args.Player.TextChannel.SendMessageAsync(
-                embed: await EmbedHandler.CreateBasicEmbed("Now Playing", $"[{track.Title}]({track.Url})", Color.Blue));
+                embed: await EmbedHandler.CreateBasicEmbed("Now Playing", $"[{track.Title}]({track.Url})", Color.Blue, fields));
         }
 
         public async Task<Embed> ShowGeniusLyrics(IGuild guild)
