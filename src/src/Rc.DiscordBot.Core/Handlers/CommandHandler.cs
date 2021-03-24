@@ -3,7 +3,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Models;
-using Rc.DiscordBot.Modules;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -49,23 +48,27 @@ namespace Rc.DiscordBot.Handlers
               Handle the message here. */
         private Task HandleCommandAsync(SocketMessage socketMessage)
         {
-            var argPos = 0;
+            int argPos = 0;
             //Check that the message is a valid command, ignore everything we don't care about. (Private message, messages from other Bots, Etc)
             if (socketMessage is not SocketUserMessage message || message.Author.IsBot || message.Author.IsWebhook || message.Channel is IPrivateChannel)
+            {
                 return Task.CompletedTask;
+            }
 
             /* Check that the message has our Prefix */
             if (!message.HasStringPrefix(_botConfig.Prefix, ref argPos))
+            {
                 return Task.CompletedTask;
+            }
 
             /* Create the CommandContext for use in modules. */
-            var context = new SocketCommandContext(_client, socketMessage as SocketUserMessage);
+            SocketCommandContext? context = new SocketCommandContext(_client, socketMessage as SocketUserMessage);
 
             /* Check if the channel ID that the message was sent from is in our Config - Blacklisted Channels. */
-            var blacklistedChannelCheck = from a in _botConfig.BlacklistedChannels
-                                          where a == context.Channel.Id
-                                          select a;
-            var blacklistedChannel = blacklistedChannelCheck.FirstOrDefault();
+            System.Collections.Generic.IEnumerable<ulong>? blacklistedChannelCheck = from a in _botConfig.BlacklistedChannels
+                                                                                     where a == context.Channel.Id
+                                                                                     select a;
+            ulong blacklistedChannel = blacklistedChannelCheck.FirstOrDefault();
 
             /* If the Channel ID is in the list of blacklisted channels. Ignore the command. */
             if (blacklistedChannel == context.Channel.Id)
@@ -74,7 +77,7 @@ namespace Rc.DiscordBot.Handlers
             }
             else
             {
-                var result = _commands.ExecuteAsync(context, argPos, _services, MultiMatchHandling.Best);
+                Task<IResult>? result = _commands.ExecuteAsync(context, argPos, _services, MultiMatchHandling.Best);
 
                 /* Report any errors if the command didn't execute succesfully. */
                 //if (!result.Result.IsSuccess)
@@ -91,11 +94,15 @@ namespace Rc.DiscordBot.Handlers
         {
             /* command is unspecified when there was a search failure (command not found); we don't care about these errors */
             if (!command.IsSpecified)
+            {
                 return;
+            }
 
             /* the command was succesful, we don't care about this result, unless we want to log that a command succeeded. */
             if (result.IsSuccess)
+            {
                 return;
+            }
 
             /* the command failed, let's notify the user that something happened. */
             await context.Channel.SendMessageAsync($"error: {result}");

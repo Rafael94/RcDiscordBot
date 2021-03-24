@@ -6,7 +6,7 @@ namespace Rc.DiscordBot.Models
     {
         public AudioConfig()
         {
-            Streams = new ();
+            Streams = new();
         }
 
         public List<StreamConfig> Streams { get; set; }

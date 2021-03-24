@@ -1,13 +1,10 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
 using Rc.DiscordBot.Utils;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TwitchLib.Api;
 using TwitchLib.Api.Helix.Models.Streams.GetStreams;
@@ -70,7 +67,7 @@ namespace Rc.DiscordBot.Services
 
         private void Monitor_OnStreamOnline(object? sender, OnStreamOnlineArgs e)
         {
-            var embed = CreateEmbed(_twitchConfig.ChannelOnline, e.Channel, e.Stream);
+            Embed? embed = CreateEmbed(_twitchConfig.ChannelOnline, e.Channel, e.Stream);
 
             SendMessageAsync(embed, e.Channel, ChannelStatus.Online).GetAwaiter().GetResult();
 
@@ -91,27 +88,27 @@ namespace Rc.DiscordBot.Services
             stream.Title = e.Stream.Title;
             stream.Game = e.Stream.GameName;
 
-            var embed = CreateEmbed(_twitchConfig.ChannelUpdated, e.Channel, e.Stream);
+            Embed? embed = CreateEmbed(_twitchConfig.ChannelUpdated, e.Channel, e.Stream);
             SendMessageAsync(embed, e.Channel, ChannelStatus.Updated).GetAwaiter().GetResult();
         }
 
         private void Monitor_OnStreamOffline(object? sender, OnStreamOfflineArgs e)
         {
-            var embed = CreateEmbed(_twitchConfig.ChannelOffline, e.Channel, e.Stream);
+            Embed? embed = CreateEmbed(_twitchConfig.ChannelOffline, e.Channel, e.Stream);
             SendMessageAsync(embed, e.Channel, ChannelStatus.Offline).GetAwaiter().GetResult();
             _onlineStreams.Remove(e.Channel);
         }
 
         private Embed CreateEmbed(string titleTemplate, string channel, Stream stream)
         {
-            var formatter = new StringFormatter(titleTemplate);
+            StringFormatter? formatter = new(titleTemplate);
             formatter.Add("@ChannelName", channel);
             formatter.Add("@UserName", stream.UserName);
             formatter.Add("@Title", stream.Title);
             formatter.Add("@GameName", stream.GameName);
             formatter.Add("@Type", stream.Type);
 
-            var notificationText = formatter.ToString();
+            string? notificationText = formatter.ToString();
 
             return new EmbedBuilder()
                                .WithTitle(notificationText)

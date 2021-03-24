@@ -7,7 +7,7 @@ namespace Rc.DiscordBot.Models
     {
         public BotConfig()
         {
-            BlacklistedChannels = new List<ulong>();     
+            BlacklistedChannels = new List<ulong>();
         }
 
         public string BotToken { get; set; } = default!;
@@ -15,6 +15,6 @@ namespace Rc.DiscordBot.Models
         public string GameStatus { get; set; } = default!;
         public List<ulong> BlacklistedChannels { get; set; }
 
-        
+
     }
 }

@@ -24,25 +24,25 @@ namespace Rc.DiscordBot.Modules
         [Command("Version")]
         public async Task GetVersionAsync()
         {
-           await ReplyAsync(embed: await EmbedHandler.CreateBasicEmbed("Version", Assembly.GetEntryAssembly()!.GetName().Version!.ToString() , Color.Blue));
+            await ReplyAsync(embed: await EmbedHandler.CreateBasicEmbed("Version", Assembly.GetEntryAssembly()!.GetName().Version!.ToString(), Color.Blue));
         }
 
         [Command("help")]
         public async Task HelpAsync()
         {
             string prefix = _botConfig.Prefix;
-            var builder = new EmbedBuilder()
+            EmbedBuilder? builder = new()
             {
                 Color = new Color(114, 137, 218),
                 Description = "Verfügbare Kommandos. Befehle zwischen {} sind Aliases. Parameter mit ? am Ende sind optional"
             };
 
-            foreach (var module in _service.Modules)
+            foreach (ModuleInfo? module in _service.Modules)
             {
                 string? description = null;
-                foreach (var cmd in module.Commands)
+                foreach (CommandInfo? cmd in module.Commands)
                 {
-                    var result = await cmd.CheckPreconditionsAsync(Context);
+                    PreconditionResult? result = await cmd.CheckPreconditionsAsync(Context);
                     if (result.IsSuccess)
                     {
                         description += $"{prefix}{cmd.Aliases[0]}";
@@ -79,7 +79,7 @@ namespace Rc.DiscordBot.Modules
         [Command("help")]
         public async Task HelpAsync(string command)
         {
-            var result = _service.Search(Context, command);
+            SearchResult result = _service.Search(Context, command);
 
             if (!result.IsSuccess)
             {
@@ -88,15 +88,15 @@ namespace Rc.DiscordBot.Modules
             }
 
             string prefix = _botConfig.Prefix;
-            var builder = new EmbedBuilder()
+            EmbedBuilder? builder = new()
             {
                 Color = new Color(114, 137, 218),
                 Description = $"Here are some commands like **{command}**"
             };
 
-            foreach (var match in result.Commands)
+            foreach (CommandMatch match in result.Commands)
             {
-                var cmd = match.Command;
+                CommandInfo? cmd = match.Command;
 
                 builder.AddField(x =>
                 {
@@ -111,7 +111,7 @@ namespace Rc.DiscordBot.Modules
 
                     x.Value += $"Parameters:\n";
 
-                    foreach (var para in cmd.Parameters)
+                    foreach (Discord.Commands.ParameterInfo? para in cmd.Parameters)
                     {
                         x.Value += $"{para.Name}{(para.IsOptional ? '?' : "")}:{para.Type.Name} {para.Summary}\n";
                     }

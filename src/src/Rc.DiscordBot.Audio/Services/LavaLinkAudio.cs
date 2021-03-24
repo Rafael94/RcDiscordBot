@@ -5,7 +5,6 @@ using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Victoria;
@@ -57,7 +56,7 @@ namespace Rc.DiscordBot.Services
 
             try
             {
-                var player = await _lavaNode.JoinAsync(voiceState.VoiceChannel, textChannel);
+                LavaPlayer? player = await _lavaNode.JoinAsync(voiceState.VoiceChannel, textChannel);
 
                 return await EmbedHandler.CreateBasicEmbed("Music, Join", $"Joined {voiceState.VoiceChannel.Name}.", Color.Green);
             }
@@ -74,7 +73,7 @@ namespace Rc.DiscordBot.Services
             try
             {
                 //Get The Player Via GuildID.
-                var player = _lavaNode.GetPlayer(guild);
+                LavaPlayer? player = _lavaNode.GetPlayer(guild);
 
                 //if The Player is playing, Stop it.
                 if (player.PlayerState is PlayerState.Playing)
@@ -98,9 +97,9 @@ namespace Rc.DiscordBot.Services
         /*This is ran when a user uses either the command Join or Play
            I decided to put these two commands as one, will probably change it in future. 
            Task Returns an Embed which is used in the command call.. */
-        public async Task<Embed> PlayAsync(SocketGuildUser user, 
-            IGuild guild, 
-            string query, 
+        public async Task<Embed> PlayAsync(SocketGuildUser user,
+            IGuild guild,
+            string query,
             FallbackSearch fallbackSearch = FallbackSearch.Youtube)
         {
             //Check If User Is Connected To Voice Cahnnel.
@@ -108,7 +107,7 @@ namespace Rc.DiscordBot.Services
             {
                 return await EmbedHandler.CreateErrorEmbed("Music, Join/Play", "You Must First Join a Voice Channel.");
             }
-            
+
             //Check the guild has a player available.
             if (!_lavaNode.HasPlayer(guild))
             {
@@ -118,7 +117,7 @@ namespace Rc.DiscordBot.Services
             try
             {
                 //Get the player for that guild.
-                var player = _lavaNode.GetPlayer(guild);
+                LavaPlayer? player = _lavaNode.GetPlayer(guild);
 
                 SearchResponse search;
 
@@ -150,11 +149,11 @@ namespace Rc.DiscordBot.Services
                 }
                 LavaTrack? track = search.Tracks?[0];
 
-                var isPlayList = string.IsNullOrWhiteSpace(search.Playlist.Name) == false;
+                bool isPlayList = string.IsNullOrWhiteSpace(search.Playlist.Name) == false;
 
                 void AddPlayList()
                 {
-                    for (var i = 1; i < search.Tracks!.Count; i++)
+                    for (int i = 1; i < search.Tracks!.Count; i++)
                     {
                         player.Queue.Enqueue(search.Tracks[i]);
                     }
@@ -179,11 +178,11 @@ namespace Rc.DiscordBot.Services
                 //If the Bot is already playing music, or if it is paused but still has music in the playlist, Add the requested track to the queue.
                 if (player.Track != null && player.PlayerState is PlayerState.Playing || player.PlayerState is PlayerState.Paused)
                 {
-                    var estimatedTime = player.Track!.Duration - player.Track.Position;
+                    TimeSpan estimatedTime = player.Track!.Duration - player.Track.Position;
 
                     foreach (var queuedTrack in player.Queue)
                     {
-                        estimatedTime += ((LavaTrack)queuedTrack).Duration;
+                        estimatedTime += queuedTrack.Duration;
                     }
 
                     player.Queue.Enqueue(track);
@@ -244,7 +243,7 @@ namespace Rc.DiscordBot.Services
             }
 
             StreamConfig? audioStream = null;
-            for (var i = 0; i < _audioConfig.Streams.Count; i++)
+            for (int i = 0; i < _audioConfig.Streams.Count; i++)
             {
                 if (string.Equals(query, _audioConfig.Streams[i].Name, StringComparison.OrdinalIgnoreCase))
                 {
@@ -263,9 +262,9 @@ namespace Rc.DiscordBot.Services
             try
             {
                 //Get the player for that guild.
-                var player = _lavaNode.GetPlayer(guild);
+                LavaPlayer? player = _lavaNode.GetPlayer(guild);
 
-                var search = await _lavaNode.SearchAsync(query);
+                SearchResponse search = await _lavaNode.SearchAsync(query);
 
                 //If we couldn't find anything, tell the user.
                 if (search.LoadStatus == LoadStatus.NoMatches)
@@ -322,9 +321,9 @@ namespace Rc.DiscordBot.Services
                 .WithCurrentTimestamp()
                 .WithTitle("Verfügbare Streams");
 
-            foreach (var stream in _audioConfig.Streams)
+            foreach (StreamConfig? stream in _audioConfig.Streams)
             {
-                var key = stream.Name;
+                string? key = stream.Name;
                 if (string.IsNullOrEmpty(stream.DisplayName) == false)
                 {
                     key = key + " - " + stream.DisplayName;
@@ -343,12 +342,14 @@ namespace Rc.DiscordBot.Services
             try
             {
                 /* Create a string builder we can use to format how we want our list to be displayed. */
-                var descriptionBuilder = new StringBuilder();
+                StringBuilder? descriptionBuilder = new();
 
                 /* Get The Player and make sure it isn't null. */
-                var player = _lavaNode.GetPlayer(guild);
+                LavaPlayer? player = _lavaNode.GetPlayer(guild);
                 if (player == null)
+                {
                     return await EmbedHandler.CreateErrorEmbed("Music, List", $"Could not aquire player.\nAre you using the bot right now? check {_botConfig.Prefix}Help for info on how to use the bot.");
+                }
 
                 if (player.PlayerState is PlayerState.Playing)
                 {
@@ -363,7 +364,7 @@ namespace Rc.DiscordBot.Services
                         /* Now we know if we have something in the queue worth replying with, so we itterate through all the Tracks in the queue.
                          *  Next Add the Track title and the url however make use of Discords Markdown feature to display everything neatly.
                             This trackNum variable is used to display the number in which the song is in place. (Start at 2 because we're including the current song.*/
-                        var trackNum = 2;
+                        int trackNum = 2;
                         foreach (LavaTrack track in player.Queue)
                         {
                             descriptionBuilder.Append($"{trackNum}: [{track.Title}]({track.Url}) - {track.Id}\n");
@@ -390,12 +391,14 @@ namespace Rc.DiscordBot.Services
         {
             try
             {
-                var player = _lavaNode.GetPlayer(guild);
+                LavaPlayer? player = _lavaNode.GetPlayer(guild);
                 /* Check if the player exists */
                 if (player == null)
+                {
                     return await EmbedHandler.CreateErrorEmbed("Music, List", $"Could not aquire player.\nAre you using the bot right now? check {_botConfig.Prefix}Help for info on how to use the bot.");
+                }
                 /* Check The queue, if it is less than one (meaning we only have the current song available to skip) it wont allow the user to skip.
-                     User is expected to use the Stop command if they're only wanting to skip the current song. */
+    User is expected to use the Stop command if they're only wanting to skip the current song. */
                 if (player.Queue.Count < 1)
                 {
                     return await EmbedHandler.CreateErrorEmbed("Music, SkipTrack", $"Unable To skip a track as there is only One or No songs currently playing." +
@@ -406,7 +409,7 @@ namespace Rc.DiscordBot.Services
                     try
                     {
                         /* Save the current song for use after we skip it. */
-                        var currentTrack = player.Track;
+                        LavaTrack? currentTrack = player.Track;
                         /* Skip the current song. */
                         await player.SkipAsync();
                         // await LoggingService.LogInformationAsync("Music", $"Bot skipped: {currentTrack.Title}");
@@ -431,10 +434,12 @@ namespace Rc.DiscordBot.Services
         {
             try
             {
-                var player = _lavaNode.GetPlayer(guild);
+                LavaPlayer? player = _lavaNode.GetPlayer(guild);
 
                 if (player == null)
+                {
                     return await EmbedHandler.CreateErrorEmbed("Music, List", $"Could not aquire player.\nAre you using the bot right now? check {_botConfig.Prefix}Help for info on how to use the bot.");
+                }
 
                 /* Check if the player exists, if it does, check if it is playing.
                      If it is playing, we can stop.*/
@@ -456,10 +461,12 @@ namespace Rc.DiscordBot.Services
         {
             try
             {
-                var player = _lavaNode.GetPlayer(guild);
+                LavaPlayer? player = _lavaNode.GetPlayer(guild);
 
                 if (player == null)
+                {
                     return await EmbedHandler.CreateErrorEmbed("Music, List", $"Could not aquire player.\nAre you using the bot right now? check {_botConfig.Prefix}Help for info on how to use the bot.");
+                }
 
                 /* Check if the player exists, if it does, check if it is playing.
                      If it is playing, we can stop.*/
@@ -487,7 +494,7 @@ namespace Rc.DiscordBot.Services
             }
             try
             {
-                var player = _lavaNode.GetPlayer(guild);
+                LavaPlayer? player = _lavaNode.GetPlayer(guild);
                 await player.UpdateVolumeAsync((ushort)volume);
                 //await LoggingService.LogInformationAsync("Music", $"Bot Volume set to: {volume}");
                 return $"Volume has been set to {volume}.";
@@ -502,7 +509,7 @@ namespace Rc.DiscordBot.Services
         {
             try
             {
-                var player = _lavaNode.GetPlayer(guild);
+                LavaPlayer? player = _lavaNode.GetPlayer(guild);
                 if (!(player.PlayerState is PlayerState.Playing))
                 {
                     await player.PauseAsync();
@@ -522,7 +529,7 @@ namespace Rc.DiscordBot.Services
         {
             try
             {
-                var player = _lavaNode.GetPlayer(guild);
+                LavaPlayer? player = _lavaNode.GetPlayer(guild);
 
                 if (player.PlayerState is PlayerState.Paused)
                 {
@@ -544,16 +551,9 @@ namespace Rc.DiscordBot.Services
                 return;
             }
 
-            if (!args.Player.Queue.TryDequeue(out var queueable))
+            if (!args.Player.Queue.TryDequeue(out LavaTrack ? track))
             {
-                //await args.Player.TextChannel.SendMessageAsync("Playback Finished.");
-                return;
-            }
-
-            if (queueable is not LavaTrack track)
-            {
-                await args.Player.TextChannel.SendMessageAsync("Next item in queue is not a track.");
-                return;
+                await args.Player.TextChannel.SendMessageAsync("Playback Finished.");
             }
 
             await args.Player.PlayAsync(track);
@@ -571,7 +571,7 @@ namespace Rc.DiscordBot.Services
 
         public async Task<Embed> ShowGeniusLyrics(IGuild guild)
         {
-            if (!_lavaNode.TryGetPlayer(guild, out var player))
+            if (!_lavaNode.TryGetPlayer(guild, out LavaPlayer? player))
             {
                 return await EmbedHandler.CreateErrorEmbed("Genius", "I'm not connected to a voice channel.");
             }
@@ -581,15 +581,15 @@ namespace Rc.DiscordBot.Services
                 return await EmbedHandler.CreateErrorEmbed("Genius", "Woaaah there, I'm not playing any tracks.");
             }
 
-            var lyrics = await player.Track.FetchLyricsFromGeniusAsync() ?? await player.Track.FetchLyricsFromOVHAsync();
+            string? lyrics = await player.Track.FetchLyricsFromGeniusAsync() ?? await player.Track.FetchLyricsFromOVHAsync();
             if (string.IsNullOrWhiteSpace(lyrics))
             {
                 return await EmbedHandler.CreateErrorEmbed("Genius", $"No lyrics found for {player.Track.Title}");
             }
 
-            var splitLyrics = lyrics.Split('\n');
-            var stringBuilder = new StringBuilder();
-            foreach (var line in splitLyrics)
+            string[]? splitLyrics = lyrics.Split('\n');
+            StringBuilder? stringBuilder = new();
+            foreach (string? line in splitLyrics)
             {
 
                 stringBuilder.AppendLine(line);

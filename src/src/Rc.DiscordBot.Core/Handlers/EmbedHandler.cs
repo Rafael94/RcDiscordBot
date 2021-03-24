@@ -16,9 +16,9 @@ namespace Rc.DiscordBot.Handlers
             IEnumerable<EmbedFieldBuilder>? fileds = null,
             EmbedAuthorBuilder? author = null)
         {
-            var builder = new EmbedBuilder()
+            EmbedBuilder? builder = new EmbedBuilder()
                 .WithTitle(title)
-                .WithDescription(description)
+                .WithCustomDescription(description)
                 .WithColor(color)
                 .WithCurrentTimestamp()
                 .WithBotFooter();
@@ -28,7 +28,7 @@ namespace Rc.DiscordBot.Handlers
                 builder = builder.WithFields(fileds);
             }
 
-            if(author != null)
+            if (author != null)
             {
                 builder.WithAuthor(author);
             }
@@ -50,7 +50,7 @@ namespace Rc.DiscordBot.Handlers
         /// <returns></returns>
         public static EmbedBuilder WithCustomDescription(this EmbedBuilder embedBuilder, string description)
         {
-            if(description == null)
+            if (description == null)
             {
                 return embedBuilder;
             }
@@ -67,7 +67,7 @@ namespace Rc.DiscordBot.Handlers
 
         public static async Task<Embed> CreateErrorEmbed(string source, string error)
         {
-            var embed = await Task.Run(() => new EmbedBuilder()
+            Embed? embed = await Task.Run(() => new EmbedBuilder()
                 .WithTitle($"ERROR OCCURED FROM - {source}")
                 .WithDescription($"**Error Deaitls**: \n{error}")
                 .WithColor(Color.DarkRed)

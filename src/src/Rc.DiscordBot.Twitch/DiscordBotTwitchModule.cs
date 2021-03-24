@@ -10,8 +10,8 @@ namespace Rc.DiscordBot
     {
         public static void ConfigureServices(HostBuilderContext hostContext, IServiceCollection services)
         {
-            var twitchConfig = hostContext.Configuration.GetSection("Twitch").Get<TwitchConfig>();
-          
+            TwitchConfig? twitchConfig = hostContext.Configuration.GetSection("Twitch").Get<TwitchConfig>();
+
             if (string.IsNullOrWhiteSpace(twitchConfig.Secret) || string.IsNullOrWhiteSpace(twitchConfig.ClientId))
             {
                 return;

@@ -26,6 +26,8 @@ namespace Rc.DiscordBot
             {
                 stoppingToken.ThrowIfCancellationRequested();
                 await _discordService.StartAsync();
+
+                // Warten bis der BackgroundService beendet wird
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     await Task.Delay(int.MaxValue, stoppingToken);
@@ -34,6 +36,10 @@ namespace Rc.DiscordBot
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Fehler beim Discord Service");
+            }
+            finally
+            {
+              await   _discordService.StopAsync();
             }
         }
     }

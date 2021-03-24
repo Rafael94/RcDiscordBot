@@ -4,15 +4,16 @@ using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Rc.DiscordBot.Services
 {
-    public class DiscordService
+    public sealed class DiscordService : IDisposable
     {
+        // To detect redundant calls
+        private bool _disposed = false;
+
         private readonly BotConfig _botConfig;
         public DiscordSocketClient Client { get; }
 
@@ -26,15 +27,16 @@ namespace Rc.DiscordBot.Services
             SubscribeDiscordEvents();
         }
 
-        private async Task InitBotAsync()
+        public async Task StartAsync()
         {
             await Client.LoginAsync(TokenType.Bot, _botConfig.BotToken);
             await Client.StartAsync();
         }
 
-        public async Task StartAsync()
+        public async Task StopAsync()
         {
-            await InitBotAsync();
+            await Client.StopAsync();
+            await Client.LogoutAsync();   
         }
 
         private void SubscribeDiscordEvents()
@@ -58,7 +60,7 @@ namespace Rc.DiscordBot.Services
 
         /*Used whenever we want to log something to the Console. 
             Todo: Hook in a Custom LoggingService. */
-        private  Task LogAsync(LogMessage logMessage)
+        private Task LogAsync(LogMessage logMessage)
         {
             //await LoggingService.LogAsync(logMessage.Source, logMessage.Severity, logMessage.Message);
             return Task.CompletedTask;
@@ -66,15 +68,15 @@ namespace Rc.DiscordBot.Services
 
         public async Task SendMessageAsync(IEnumerable<MessageSendToDiscordServer> discordServers, string? text = null, Embed? embed = null)
         {
-            var servers = Client.Guilds;
+            IReadOnlyCollection<SocketGuild>? servers = Client.Guilds;
 
             // Server durchlaufen die Benachrichtigt werden sollen
-            foreach (var discordServer in discordServers)
+            foreach (MessageSendToDiscordServer? discordServer in discordServers)
             {
                 SocketGuild? socketGuild = null;
 
                 // Discord Server ID ermitteln
-                foreach (var server in servers)
+                foreach (SocketGuild? server in servers)
                 {
                     if (string.Equals(server.Name, discordServer.Name, StringComparison.OrdinalIgnoreCase))
                     {
@@ -89,7 +91,7 @@ namespace Rc.DiscordBot.Services
                     continue;
                 }
 
-                foreach (var channel in socketGuild.Channels)
+                foreach (SocketGuildChannel? channel in socketGuild.Channels)
                 {
                     // Nur Text Channels beachten
                     if ((channel is SocketTextChannel txtChannel))
@@ -97,13 +99,31 @@ namespace Rc.DiscordBot.Services
                         // Prüfen ob es im Channel gepostet werden soll
                         if (string.Equals(channel.Name, discordServer.Channel, StringComparison.OrdinalIgnoreCase))
                         {
-                            await txtChannel.SendMessageAsync(embed: embed);
+                            await txtChannel.SendMessageAsync(text: text, embed: embed);
                             break;
                         }
                     }
                 }
 
             }
+        }
+
+        
+        public void Dispose() => Dispose(true);
+
+        private void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                Client.Dispose();
+            }
+
+            _disposed = true;
         }
     }
 }
