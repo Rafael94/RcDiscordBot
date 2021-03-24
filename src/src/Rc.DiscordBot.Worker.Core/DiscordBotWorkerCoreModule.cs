@@ -16,6 +16,7 @@ namespace Rc.DiscordBot
             DiscordBotCoreModule.ConfigureServices(hostContext, services);
             DiscordBotAudioModule.ConfigureServices(hostContext, services);
             DiscordBotTwitchModule.ConfigureServices(hostContext, services);
+            DiscordBotRssModule.ConfigureServices(hostContext, services);
 
             services.AddSingleton((IServiceProvider provider) =>
             {
@@ -23,7 +24,8 @@ namespace Rc.DiscordBot
 
                 commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotCoreModule))!).GetAwaiter().GetResult();
                 commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotAudioModule))!).GetAwaiter().GetResult();
-                //commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotTwitchModule))!).GetAwaiter().GetResult();
+                commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotTwitchModule))!).GetAwaiter().GetResult();
+                commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotRssModule))!).GetAwaiter().GetResult();
 
                 return commandHandler;
             });

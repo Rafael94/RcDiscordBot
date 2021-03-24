@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rc.DiscordBot.Audio", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rc.DiscordBot.Twitch", "src\Rc.DiscordBot.Twitch\Rc.DiscordBot.Twitch.csproj", "{CDEEF77A-03E5-47D7-BF09-037CC8724668}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rc.DiscordBot.Rss", "src\Rc.DiscordBot.Rss\Rc.DiscordBot.Rss.csproj", "{3A36A53C-20AB-41B4-AC7F-5974EC868E51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{CDEEF77A-03E5-47D7-BF09-037CC8724668}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDEEF77A-03E5-47D7-BF09-037CC8724668}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDEEF77A-03E5-47D7-BF09-037CC8724668}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A36A53C-20AB-41B4-AC7F-5974EC868E51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A36A53C-20AB-41B4-AC7F-5974EC868E51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A36A53C-20AB-41B4-AC7F-5974EC868E51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A36A53C-20AB-41B4-AC7F-5974EC868E51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +72,7 @@ Global
 		{409ED835-0814-4B5E-A110-3A9006D7E3F1} = {C51063DB-5083-4D83-BE73-A90129C33C09}
 		{4B419B9B-F03F-436F-9347-3165C131F504} = {C51063DB-5083-4D83-BE73-A90129C33C09}
 		{CDEEF77A-03E5-47D7-BF09-037CC8724668} = {C51063DB-5083-4D83-BE73-A90129C33C09}
+		{3A36A53C-20AB-41B4-AC7F-5974EC868E51} = {C51063DB-5083-4D83-BE73-A90129C33C09}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F7E4A7A2-9E79-4334-9470-31CE6CD26269}
