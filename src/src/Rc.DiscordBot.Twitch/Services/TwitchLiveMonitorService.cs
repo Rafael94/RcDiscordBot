@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Options;
+using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
 using Rc.DiscordBot.Utils;
 using System;
@@ -25,17 +26,17 @@ namespace Rc.DiscordBot.Services
         }
 
         private readonly TwitchConfig _twitchConfig;
-        private readonly DiscordSocketClient _client;
+        private readonly DiscordService _discordService;
         private readonly Dictionary<string, OnlineStreamValues> _onlineStreams = new();
 
         private LiveStreamMonitorService? _monitor;
         private TwitchAPI? _api;
 
 
-        public TwitchLiveMonitorService(IOptions<TwitchConfig> twitchConfig, DiscordSocketClient client)
+        public TwitchLiveMonitorService(IOptions<TwitchConfig> twitchConfig, DiscordService discordService)
         {
             _twitchConfig = twitchConfig.Value;
-            _client = client;
+            _discordService = discordService;
         }
 
         /// <summary>
@@ -43,19 +44,8 @@ namespace Rc.DiscordBot.Services
         /// 
         /// </summary>
         /// <returns>True wenn einegrichtet</returns>
-        public bool ConfigLiveMonitor()
+        public void ConfigLiveMonitor()
         {
-            if (string.IsNullOrWhiteSpace(_twitchConfig.Secret) || string.IsNullOrWhiteSpace(_twitchConfig.ClientId))
-            {
-                return false;
-            }
-
-
-            if (_twitchConfig.TwitchChannels?.Count == 0)
-            {
-                return false;
-            }
-
             _api = new TwitchAPI();
 
             _api.Settings.ClientId = _twitchConfig.ClientId;
@@ -71,8 +61,6 @@ namespace Rc.DiscordBot.Services
             _monitor.OnStreamUpdate += Monitor_OnStreamUpdate;
 
             _monitor.Start();
-
-            return true;
         }
 
         public void Stop()
@@ -134,9 +122,11 @@ namespace Rc.DiscordBot.Services
                                .AddField("Zuschauer", stream.ViewerCount)
                                .AddField("Typ", stream.Type)
                                .WithAuthor(stream.UserName)
-                               .WithFooter("Erstellt von RC Bot. https://twitch.tv/vincitorede")
+                               .WithColor(Color.Blue)
+                               .WithBotFooter()
                                .Build();
         }
+
         private async Task SendMessageAsync(Embed embed, string channelName, ChannelStatus status)
         {
             if (_twitchConfig.TwitchChannels!.TryGetValue(channelName, out TwitchChannel? twitchChannel) == false)
@@ -144,10 +134,11 @@ namespace Rc.DiscordBot.Services
                 return;
             }
 
-            if(status == ChannelStatus.Online && twitchChannel.NotificationWhenOnline == false)
+            if (status == ChannelStatus.Online && twitchChannel.NotificationWhenOnline == false)
             {
                 return;
-            } else if(status == ChannelStatus.Offline && twitchChannel.NotificationWhenOffline == false)
+            }
+            else if (status == ChannelStatus.Offline && twitchChannel.NotificationWhenOffline == false)
             {
                 return;
             }
@@ -156,44 +147,7 @@ namespace Rc.DiscordBot.Services
                 return;
             }
 
-            var servers = _client.Guilds;
-
-            // Server durchlaufen die Benachrichtigt werden sollen
-            foreach (var discordServer in twitchChannel.DiscordServers)
-            {
-                SocketGuild? socketGuild = null;
-
-                // Discord Server ID ermitteln
-                foreach (var server in servers)
-                {
-                    if (string.Equals(server.Name, discordServer.Name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        socketGuild = server;
-                        break;
-                    }
-                }
-
-                // Wenn der DiscordServer nicht gefunden worden ist, den nächsten Server abrufen
-                if (socketGuild == null)
-                {
-                    continue;
-                }
-
-                foreach (var channel in socketGuild.Channels)
-                {
-                    // Nur Text Channels beachten
-                    if ((channel is SocketTextChannel txtChannel))
-                    {
-                        // Prüfen ob es im Channel gepostet werden soll
-                        if (string.Equals(channel.Name, discordServer.Channel, StringComparison.OrdinalIgnoreCase))
-                        {
-                            await txtChannel.SendMessageAsync(embed: embed);
-                            break;
-                        }
-                    }
-                }
-
-            }
+            await _discordService.SendMessageAsync(twitchChannel.DiscordServers, embed: embed);
         }
 
     }

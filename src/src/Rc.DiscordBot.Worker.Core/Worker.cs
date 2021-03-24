@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rc.DiscordBot.Services;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,8 +21,20 @@ namespace Rc.DiscordBot
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Start Discord");
-            await _discordService.StartAsync(stoppingToken);
-            stoppingToken.WaitHandle.WaitOne();
+
+            try
+            {
+                stoppingToken.ThrowIfCancellationRequested();
+                await _discordService.StartAsync();
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    await Task.Delay(int.MaxValue, stoppingToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Fehler beim Discord Service");
+            }
         }
     }
 }

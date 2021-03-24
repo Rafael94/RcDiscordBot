@@ -1,12 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using Rc.DiscordBot.Models;
 using Rc.DiscordBot.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,16 +16,26 @@ namespace Rc.DiscordBot
             _liveMonitoringService = liveMonitoringService;
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            if (_liveMonitoringService.ConfigLiveMonitor())
-            {
-                stoppingToken.WaitHandle.WaitOne();
+            _liveMonitoringService.ConfigLiveMonitor();
 
+            try
+            {
+                stoppingToken.ThrowIfCancellationRequested();
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    // Do async work
+                    await Task.Delay(int.MaxValue, stoppingToken);
+                }
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
                 _liveMonitoringService.Stop();
             }
-
-            return Task.CompletedTask;
         }
     }
 }

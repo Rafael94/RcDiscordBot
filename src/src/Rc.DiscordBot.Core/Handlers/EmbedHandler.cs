@@ -1,4 +1,5 @@
 ﻿using Discord;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -19,7 +20,8 @@ namespace Rc.DiscordBot.Handlers
                 .WithTitle(title)
                 .WithDescription(description)
                 .WithColor(color)
-                .WithCurrentTimestamp();
+                .WithCurrentTimestamp()
+                .WithBotFooter();
 
             if (fileds != null)
             {
@@ -32,6 +34,35 @@ namespace Rc.DiscordBot.Handlers
             }
 
             return Task.FromResult(builder.Build());
+        }
+
+        public static EmbedBuilder WithBotFooter(this EmbedBuilder embedBuilder)
+        {
+            return embedBuilder.WithFooter("Bot von Rafael Carnucci. https://twitch.tv/vincitorede");
+        }
+
+        /// <summary>
+        /// Kürzt automatisch zu lange Beschreibungen
+        /// Ersetzt <br> durch Zeilenumbrüche
+        /// </summary>
+        /// <param name="embedBuilder"></param>
+        /// <param name="description"></param>
+        /// <returns></returns>
+        public static EmbedBuilder WithCustomDescription(this EmbedBuilder embedBuilder, string description)
+        {
+            if(description == null)
+            {
+                return embedBuilder;
+            }
+
+            description = description.Replace("<br>", Environment.NewLine, StringComparison.OrdinalIgnoreCase).Replace("<br/>", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
+
+            if (description.Length > 2048)
+            {
+                description = description[0..2044] + "...";
+            }
+
+            return embedBuilder.WithDescription(description);
         }
 
         public static async Task<Embed> CreateErrorEmbed(string source, string error)

@@ -1,14 +1,12 @@
 ﻿using CodeHollow.FeedReader;
+using Discord;
 using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
 using Rc.DiscordBot.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,39 +14,63 @@ namespace Rc.DiscordBot
 {
     public class RssWorker : BackgroundService
     {
-        public RssWorker(RssConfig rssConfig, DiscordSocketClient discordClient)
+        public RssWorker(IOptions<RssConfig> rssConfig, DiscordService discordService)
         {
-            _rssConfig = rssConfig;
-            _discordClient = discordClient;
+            _rssConfig = rssConfig.Value;
+            _discordService = discordService;
         }
 
         private readonly RssConfig _rssConfig;
-        private readonly DiscordSocketClient _discordClient;
+        private readonly DiscordService _discordService;
         private readonly DateTime _startTime = DateTime.Now;
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var timer = new Timer(HandleTimerCallback, null, TimeSpan.Zero, _rssConfig.Interval);
-            stoppingToken.WaitHandle.WaitOne();
-            timer.Dispose();
-            return Task.CompletedTask;
+
+            try
+            {
+                stoppingToken.ThrowIfCancellationRequested();
+                using var timer = new Timer(HandleTimerCallback, null, _rssConfig.Interval, _rssConfig.Interval);
+
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    // Do async work
+                    await Task.Delay(int.MaxValue, stoppingToken);
+                }
+            }
+            catch (Exception) {}       
         }
         private async void HandleTimerCallback(object? state)
         {
-            for(var i = 0; i <_rssConfig.Feeds.Count;i++)
+            for (var i = 0; i < _rssConfig.Feeds.Count; i++)
             {
                 var feedList = await FeedReader.ReadAsync(_rssConfig.Feeds[i].Url);
-               
-                foreach(var feed in feedList.Items)
+
+                foreach (var feed in feedList.Items)
                 {
-                    if(feed.PublishingDate < _startTime)
+                    // Liste ist nach Datum sortiert
+                    if (feed.PublishingDate < _startTime)
                     {
                         break;
                     }
 
-                    
+                    await _discordService.SendMessageAsync(_rssConfig.Feeds[i].DiscordServers, embed: CreateEmbed(_rssConfig.Feeds[i].Name, feed));
+
+                    break;
                 }
-            }         
+            }
+        }
+
+        private  static Embed CreateEmbed(string feedName, FeedItem item)
+        {
+            return new EmbedBuilder()
+                               .WithTitle($"RSS - {feedName}: {item.Title}")
+                               .WithCustomDescription(item.Description)
+                               .WithUrl(item.Link)
+                               .WithAuthor(item.Author)
+                               .WithColor(Color.Blue)
+                               .WithBotFooter()
+                               .Build();
         }
     }
 }

@@ -3,11 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Rc.DiscordBot.Models;
 using Rc.DiscordBot.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Rc.DiscordBot
 {
@@ -15,9 +10,21 @@ namespace Rc.DiscordBot
     {
         public static void ConfigureServices(HostBuilderContext hostContext, IServiceCollection services)
         {
-            services.Configure<TwitchConfig>(options => hostContext.Configuration.GetSection("Twitch").Bind(options));
-            services.AddSingleton<TwitchLiveMonitorService>();
+            var twitchConfig = hostContext.Configuration.GetSection("Twitch").Get<TwitchConfig>();
+          
+            if (string.IsNullOrWhiteSpace(twitchConfig.Secret) || string.IsNullOrWhiteSpace(twitchConfig.ClientId))
+            {
+                return;
+            }
 
+            if (twitchConfig.TwitchChannels?.Count == 0)
+            {
+                return;
+            }
+
+            services.Configure<TwitchConfig>(options => hostContext.Configuration.GetSection("Twitch").Bind(options));
+
+            services.AddSingleton<TwitchLiveMonitorService>();
             services.AddHostedService<TwitchWorker>();
         }
     }

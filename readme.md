@@ -62,5 +62,7 @@ Der Prefix für die Befehle kann beliebig unter 'appsettings.json' angepasst werd
 - `!help {Command}` => {Command} mit dem Befehl des zu erklärenden Befehls ersetzen
 - `!join` => Den Bot zum aktullen Sprachchannel hinzufügen
 - `!ListStream` => Gespeicherte Streams anzeigen
-- `!PlayStream {NameOderAudioStreamUrl}` => Spielt einen gespeicherten Stream bzw. den Stream von einer URL ab
+- `!play` => Sucht musik von einer URL ab oder sucht in Youtube
+- `!sc` => Sucht musik von einer URL ab oder sucht in SoundCloud
+- `!stream streamName` => Spielt einen gespeicherten Stream ab
 - `!Stop` => Beendet den Stream und entfernt den Bot aus dem Channel

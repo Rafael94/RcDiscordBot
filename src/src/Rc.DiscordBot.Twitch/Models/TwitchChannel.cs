@@ -23,6 +23,6 @@ namespace Rc.DiscordBot.Models
         /// Key => Servername
         /// Value => Channels
         /// </summary>
-        public List<TwitchDiscordServer> DiscordServers { get; set; }
+        public List<MessageSendToDiscordServer> DiscordServers { get; set; }
     }
 }
