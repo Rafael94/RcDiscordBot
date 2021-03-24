@@ -2,7 +2,7 @@
 
 Funktionen
 - Audio Streams abspielen 
-- Audi Streams können fest hinterlegt werden, sodass nur der Name zum apsielen benötigt wird
+- Audi Streams können fest hinterlegt werden, sodass nur der Name zum abspielen benötigt wird
 - Benachrichtigen wenn ein Twich Channel Online geht
 
 ## Installation
