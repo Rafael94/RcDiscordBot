@@ -98,14 +98,17 @@ namespace Rc.DiscordBot.Services
         /*This is ran when a user uses either the command Join or Play
            I decided to put these two commands as one, will probably change it in future. 
            Task Returns an Embed which is used in the command call.. */
-        public async Task<Embed> PlayAsync(SocketGuildUser user, IGuild guild, string query, FallbackSearch fallbackSearch = FallbackSearch.Youtube)
+        public async Task<Embed> PlayAsync(SocketGuildUser user, 
+            IGuild guild, 
+            string query, 
+            FallbackSearch fallbackSearch = FallbackSearch.Youtube)
         {
             //Check If User Is Connected To Voice Cahnnel.
             if (user.VoiceChannel == null)
             {
                 return await EmbedHandler.CreateErrorEmbed("Music, Join/Play", "You Must First Join a Voice Channel.");
             }
-
+            
             //Check the guild has a player available.
             if (!_lavaNode.HasPlayer(guild))
             {
@@ -163,6 +166,10 @@ namespace Rc.DiscordBot.Services
                     new EmbedFieldBuilder().WithIsInline(true).WithName("Duration").WithValue(track!.Duration.ToString(@"hh\:mm\:ss"))
                 };
 
+                EmbedAuthorBuilder author = new EmbedAuthorBuilder()
+                    .WithName(user.Nickname)
+                    .WithIconUrl(user.GetAvatarUrl());
+
                 if (isPlayList)
                 {
                     fields.Add(new EmbedFieldBuilder().WithIsInline(true).WithName("Playlist").WithValue("Yes"));
@@ -189,7 +196,7 @@ namespace Rc.DiscordBot.Services
                     }
 
                     //await LoggingService.LogInformationAsync("Music", $"{track.Title} has been added to the music queue.");
-                    return await EmbedHandler.CreateBasicEmbed("Music", $"{track.Title} has been added to queue.", Color.Blue, fields);
+                    return await EmbedHandler.CreateBasicEmbed("Music", $"{track.Title} has been added to queue.", Color.Blue, fields, author);
                 }
 
                 //Player was not playing anything, so lets play the requested track.
@@ -202,7 +209,7 @@ namespace Rc.DiscordBot.Services
 
                 //await LoggingService.LogInformationAsync("Music", $"Bot Now Playing: {track.Title}\nUrl: {track.Url}");
 
-                return await EmbedHandler.CreateBasicEmbed("Music", $"Now Playing: {track.Title}\nUrl: {track.Url}", Color.Blue, fields);
+                return await EmbedHandler.CreateBasicEmbed("Music", $"Now Playing: {track.Title}\nUrl: {track.Url}", Color.Blue, fields, author);
             }
 
             //If after all the checks we did, something still goes wrong. Tell the user about it so they can report it back to us.
@@ -290,8 +297,12 @@ namespace Rc.DiscordBot.Services
                     new EmbedFieldBuilder().WithIsInline(true).WithName("Channel").WithValue(player.VoiceChannel.Name),
                 };
 
+                EmbedAuthorBuilder author = new EmbedAuthorBuilder()
+                    .WithName(user.Nickname)
+                    .WithIconUrl(user.GetAvatarUrl());
+
                 //await LoggingService.LogInformationAsync("Music", $"Bot Now Playing: {track.Title}\nUrl: {track.Url}");
-                return await EmbedHandler.CreateBasicEmbed("Music", $"Now Playing: {track!.Title}\nUrl: {track.Url}", Color.Blue, fields);
+                return await EmbedHandler.CreateBasicEmbed("Music", $"Now Playing: {track!.Title}\nUrl: {track.Url}", Color.Blue, fields, author);
             }
 
             //If after all the checks we did, something still goes wrong. Tell the user about it so they can report it back to us.

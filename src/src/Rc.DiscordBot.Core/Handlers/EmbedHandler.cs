@@ -12,7 +12,8 @@ namespace Rc.DiscordBot.Handlers
         public static Task<Embed> CreateBasicEmbed(string title,
             string description,
             Color color,
-            IEnumerable<EmbedFieldBuilder>? fileds = null)
+            IEnumerable<EmbedFieldBuilder>? fileds = null,
+            EmbedAuthorBuilder? author = null)
         {
             var builder = new EmbedBuilder()
                 .WithTitle(title)
@@ -23,6 +24,11 @@ namespace Rc.DiscordBot.Handlers
             if (fileds != null)
             {
                 builder = builder.WithFields(fileds);
+            }
+
+            if(author != null)
+            {
+                builder.WithAuthor(author);
             }
 
             return Task.FromResult(builder.Build());
