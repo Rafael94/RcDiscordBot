@@ -142,6 +142,11 @@ namespace Rc.DiscordBot.Services
                 //TODO: Add a 1-5 list for the user to pick from. (Like Fredboat)
                 LavaTrack? track = search.Tracks.FirstOrDefault();
 
+                if (track == null)
+                {
+                    return await EmbedHandler.CreateErrorEmbed("Music", $"I wasn't able to find the Stream.");
+                }
+
                 var isPlayList = string.IsNullOrWhiteSpace(search.Playlist.Name) == false;
 
                 void AddPlayList()
@@ -152,25 +157,39 @@ namespace Rc.DiscordBot.Services
                     }
                 };
 
-                string message;
+                List<EmbedFieldBuilder> embeds = new()
+                {
+                    new EmbedFieldBuilder().WithIsInline(true).WithName("Channel").WithValue(player.VoiceChannel.Name),
+                    new EmbedFieldBuilder().WithIsInline(true).WithName("Duration").WithValue(track.Duration.ToString(@"hh\:mm\:ss"))
+                };
+
+                if (isPlayList)
+                {
+                    embeds.Add(new EmbedFieldBuilder().WithIsInline(true).WithName("Playlist").WithValue("Yes"));
+                    embeds.Add(new EmbedFieldBuilder().WithIsInline(true).WithName("Tracks").WithValue(search.Tracks.Count()));
+                }
 
                 //If the Bot is already playing music, or if it is paused but still has music in the playlist, Add the requested track to the queue.
                 if (player.Track != null && player.PlayerState is PlayerState.Playing || player.PlayerState is PlayerState.Paused)
                 {
-                    player.Queue.Enqueue(track);
+                    var estimatedTime = player.Track!.Duration - player.Track.Position;
 
-                   
-                    if (isPlayList)
+                    foreach(var queuedTrack in player.Queue)
                     {
-                        AddPlayList();
-                        message = $"{track.Title} and further {search.Tracks.Count() - 1} Tracks has been added to queue.";
-                    } else
-                    {
-                        message = $"{track.Title} has been added to queue.";
+                        estimatedTime += ((LavaTrack)queuedTrack).Duration;
                     }
 
+                    player.Queue.Enqueue(track);
+
+                    embeds.Add(new EmbedFieldBuilder().WithIsInline(true).WithName("Position in queue").WithValue(player.Queue.Count));
+
+                    if (isPlayList)
+                    {
+                        AddPlayList();                    
+                    } 
+
                     //await LoggingService.LogInformationAsync("Music", $"{track.Title} has been added to the music queue.");
-                    return await EmbedHandler.CreateBasicEmbed("Music", message, Color.Blue);
+                    return await EmbedHandler.CreateBasicEmbed("Music", $"{track.Title} has been added to queue.", Color.Blue, embeds);
                 }
 
                 //Player was not playing anything, so lets play the requested track.
@@ -179,16 +198,11 @@ namespace Rc.DiscordBot.Services
                 if (isPlayList)
                 {
                     AddPlayList();
-                    message = $"Now Playing: {track.Title}\nUrl: {track.Url}\n{search.Tracks.Count() - 1} Tracks has been added to queue.";
                 }
-                else
-                {
-                    message = $"Now Playing: {track.Title}\nUrl: {track.Url}";
-                }
-
+                
                 //await LoggingService.LogInformationAsync("Music", $"Bot Now Playing: {track.Title}\nUrl: {track.Url}");
 
-                return await EmbedHandler.CreateBasicEmbed("Music", message, Color.Blue);
+                return await EmbedHandler.CreateBasicEmbed("Music", $"Now Playing: {track.Title}\nUrl: {track.Url}", Color.Blue, embeds);
             }
 
             //If after all the checks we did, something still goes wrong. Tell the user about it so they can report it back to us.
