@@ -45,7 +45,7 @@ namespace Rc.DiscordBot.Modules
         }
 
         [Command("read")]
-        public async Task ReadAsync(string name, int anzahl = 1)
+        public async Task ReadAsync([Remainder]string name, int anzahl = 1)
         {
             List<EmbedFieldBuilder>? fileds = new();
 
@@ -62,7 +62,7 @@ namespace Rc.DiscordBot.Modules
             var i = 0;
             foreach(var feedItem in feedList.Items)
             {
-                if (i >= anzahl && i >= feedList.Items.Count)
+                if (i >= anzahl || i >= feedList.Items.Count)
                 {
                     break;
                 }
