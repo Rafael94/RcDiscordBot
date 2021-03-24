@@ -1,8 +1,10 @@
 ﻿using Discord;
 using Discord.Commands;
 using Microsoft.Extensions.Options;
+using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Rc.DiscordBot.Modules
@@ -19,6 +21,11 @@ namespace Rc.DiscordBot.Modules
             _botConfig = botConfig.Value;
         }
 
+        [Command("Version")]
+        public async Task GetVersionAsync()
+        {
+           await ReplyAsync(embed: await EmbedHandler.CreateBasicEmbed("Version", Assembly.GetEntryAssembly()!.GetName().Version!.ToString() , Color.Blue));
+        }
 
         [Command("help")]
         public async Task HelpAsync()
