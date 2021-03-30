@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Models;
 using System;
@@ -16,15 +17,17 @@ namespace Rc.DiscordBot.Handlers
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
         private readonly BotConfig _botConfig;
+        private readonly ILogger<CommandHandler> _logger;
 
-        public CommandHandler(DiscordSocketClient client, CommandService commands, IServiceProvider services, IOptions<BotConfig> botConfig)
+        public CommandHandler(DiscordSocketClient client, CommandService commands, IServiceProvider services, IOptions<BotConfig> botConfig, ILogger<CommandHandler> logger)
         {
             _client = client;
             _commands = commands;
             _services = services;
             _botConfig = botConfig.Value;
+            _logger = logger;
 
-            HookEvents();
+            HookEvents();         
         }
 
         /* Initialize the CommandService. */
@@ -80,10 +83,10 @@ namespace Rc.DiscordBot.Handlers
                 Task<IResult>? result = _commands.ExecuteAsync(context, argPos, _services, MultiMatchHandling.Best);
 
                 /* Report any errors if the command didn't execute succesfully. */
-                //if (!result.Result.IsSuccess)
-                //{
-                //    context.Channel.SendMessageAsync(result.Result.ErrorReason);
-                //}
+                if (!result.Result.IsSuccess)
+                {
+                    context.Channel.SendMessageAsync(result.Result.ErrorReason);
+                }
 
                 /* If everything worked fine, command will run. */
                 return result;
@@ -110,9 +113,29 @@ namespace Rc.DiscordBot.Handlers
 
         /*Used whenever we want to log something to the Console. 
             Todo: Hook in a Custom LoggingService. */
-        private Task LogAsync(LogMessage log)
+        private Task LogAsync(LogMessage logMessage)
         {
-            Console.WriteLine(log.ToString());
+            switch (logMessage.Severity)
+            {
+                case LogSeverity.Critical:
+                    _logger.LogCritical(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
+                    break;
+                case LogSeverity.Error:
+                    _logger.LogError(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
+                    break;
+                case LogSeverity.Warning:
+                    _logger.LogWarning(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
+                    break;
+                case LogSeverity.Info:
+                    _logger.LogInformation(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
+                    break;
+                case LogSeverity.Verbose:
+                    _logger.LogTrace(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
+                    break;
+                case LogSeverity.Debug:
+                    _logger.LogDebug(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
+                    break;
+            }
 
             return Task.CompletedTask;
         }

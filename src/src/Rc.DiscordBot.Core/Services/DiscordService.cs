@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
@@ -15,28 +16,33 @@ namespace Rc.DiscordBot.Services
         private bool _disposed = false;
 
         private readonly BotConfig _botConfig;
-        public DiscordSocketClient Client { get; }
+        private readonly ILogger<DiscordService> _logger;
+        public DiscordSocketClient Client { get; init; }
 
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Nicht verwendete Parameter entfernen", Justification = "<Ausstehend>")]
-        public DiscordService(IOptions<BotConfig> botConfigOptions, DiscordSocketClient client, CommandHandler commandHandler /* Wird benötigt, damit der Commandhandler initialisiert wird*/)
+        public DiscordService(IOptions<BotConfig> botConfigOptions, DiscordSocketClient client, CommandHandler commandHandler /* Wird benötigt, damit der Commandhandler initialisiert wird*/, ILogger<DiscordService> logger)
         {
             _botConfig = botConfigOptions.Value;
             Client = client;
+            _logger = logger;
 
             SubscribeDiscordEvents();
+
         }
 
         public async Task StartAsync()
         {
+            _logger.LogInformation("Start Discord Bot");
             await Client.LoginAsync(TokenType.Bot, _botConfig.BotToken);
             await Client.StartAsync();
         }
 
         public async Task StopAsync()
         {
+            _logger.LogInformation("Stop Discord Bot");
             await Client.StopAsync();
-            await Client.LogoutAsync();   
+            await Client.LogoutAsync();
         }
 
         private void SubscribeDiscordEvents()
@@ -47,22 +53,37 @@ namespace Rc.DiscordBot.Services
 
         private async Task ReadyAsync()
         {
-            try
-            {
-                await Client.SetGameAsync(_botConfig.GameStatus);
-            }
-            catch (Exception ex)
-            {
-                // await LoggingService.LogInformationAsync(ex.Source, ex.Message);
-            }
 
+            _logger.LogInformation("Discord Bot Ready");
+            await Client.SetGameAsync(_botConfig.GameStatus);
         }
 
         /*Used whenever we want to log something to the Console. 
             Todo: Hook in a Custom LoggingService. */
         private Task LogAsync(LogMessage logMessage)
         {
-            //await LoggingService.LogAsync(logMessage.Source, logMessage.Severity, logMessage.Message);
+            switch (logMessage.Severity)
+            {
+                case LogSeverity.Critical:
+                    _logger.LogCritical(logMessage.Exception,$"Source: {logMessage.Source} Message: {logMessage.Message}");
+                    break;
+                case LogSeverity.Error:
+                    _logger.LogError(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
+                    break;
+                case LogSeverity.Warning:
+                    _logger.LogWarning(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
+                    break;
+                case LogSeverity.Info:
+                    _logger.LogInformation(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
+                    break;
+                case LogSeverity.Verbose:
+                    _logger.LogTrace(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
+                    break;
+                case LogSeverity.Debug:
+                    _logger.LogDebug(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
+                    break;
+            }
+ 
             return Task.CompletedTask;
         }
 
@@ -108,7 +129,7 @@ namespace Rc.DiscordBot.Services
             }
         }
 
-        
+
         public void Dispose() => Dispose(true);
 
         private void Dispose(bool disposing)

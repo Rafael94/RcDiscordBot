@@ -20,7 +20,7 @@ namespace Rc.DiscordBot
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Start Discord");
+            _logger.LogInformation("Start Worker");
 
             try
             {

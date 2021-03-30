@@ -1,13 +1,31 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Rc.DiscordBot.Handlers;
+using Serilog;
+using Serilog.Events;
 using System;
+using System.IO;
 using System.Reflection;
 
 namespace Rc.DiscordBot
 {
     public class DiscordBotWorkerCoreModule
     {
+        public static void ConfigureLog()
+        {
+            var configuration = new ConfigurationBuilder()
+               .SetBasePath(Directory.GetCurrentDirectory())
+               .AddJsonFile("appsettings.json")
+               .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", true)
+               .Build();
+
+
+            Log.Logger = new LoggerConfiguration()
+                 .ReadFrom.Configuration(configuration)
+                .CreateLogger();
+
+        }
         public static void ConfigureServices(HostBuilderContext hostContext, IServiceCollection services)
         {
             services.AddHostedService<Worker>();
