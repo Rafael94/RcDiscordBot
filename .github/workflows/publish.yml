@@ -48,7 +48,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Windows x64
-        path: /home/runner/work/DiscordBot/DiscordBot/publish/swindows-x64
+        path: /home/runner/work/DiscordBot/DiscordBot/publish/windows-x64
 
       
       
