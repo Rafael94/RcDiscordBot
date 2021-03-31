@@ -5,6 +5,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Rc.DiscordBot</RootNamespace>
+    <Configurations>Debug;Release;Windows;Linux</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

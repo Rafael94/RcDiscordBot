@@ -1,0 +1,54 @@
+name: Discord Bot
+
+on: workflow_dispatch
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore src/Rc.DiscordBot.sln
+    - name: Test
+      run: dotnet test src/Rc.DiscordBot.sln --verbosity normal
+    # Linux Standalone
+    - name: Publish Linux x64 Standalone
+      run: dotnet publish src/src/Rc.DiscordBot.Worker/Rc.DiscordBot.Worker.csproj --self-contained true -p:PublishTrimmed=true -c Linux -o publish/linux-x64-standalone -r linux-x64 
+    - name: Upload Linux x64 Standalone Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Linux x64 Standalone
+        path: /home/runner/work/DiscordBot/DiscordBot/src/src/Rc.DiscordBot.Worker/publish/linux-x64-standalone/  
+    # Linux
+    - name: Publish x64 Linux
+      run: dotnet publish src/src/Rc.DiscordBot.Worker/Rc.DiscordBot.Worker.csproj --self-contained false -c Linux -o publish/linux-x64 -r linux-x64 --no-restore
+    - name: Upload Linux x64 Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Linux x64
+        path: /home/runner/work/DiscordBot/DiscordBot/src/src/Rc.DiscordBot.Worker/publish/linux-x64/
+   # Windows x64 Standalone
+    - name: Publish Windows x64 Standalone
+      run: dotnet publish src/src/Rc.DiscordBot.Worker/Rc.DiscordBot.Worker.csproj --self-contained true -p:PublishTrimmed=true -c Windows -o publish/windows-x64-standalone -r win-x64
+    - name: Upload Windows x64 Standalone Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Windows x64 Standalone
+        path: /home/runner/work/DiscordBot/DiscordBot/src/src/Rc.DiscordBot.Worker/publish/windows-x64-standalone/  
+    # Windows x64
+    - name: Publish Windows x64
+      run: dotnet publish src/src/Rc.DiscordBot.Worker/Rc.DiscordBot.Worker.csproj --self-contained false -c Windows -o publish/windows-x64 -r win-x64  --no-restore 
+    - name: Upload Windows x64 Standalone Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Windows x64
+        path: /home/runner/work/DiscordBot/DiscordBot/src/src/Rc.DiscordBot.Worker/publish/windows-x64
+
+      
+      

@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace Rc.DiscordBot
 {
-    public class DiscordBotWorkerCoreModule
+    public class DiscordBotWorkerModule
     {
         public static void ConfigureLog()
         {
