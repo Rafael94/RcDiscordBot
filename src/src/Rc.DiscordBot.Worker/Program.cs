@@ -9,7 +9,6 @@ namespace Rc.DiscordBot
 {
     public class Program
     {
-        private const Os
         public static async Task<int> Main(string[] args)
         {
             ConfigureLog();
