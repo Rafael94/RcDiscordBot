@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Rc.DiscordBot.Handlers;
+using Rc.DiscordBot.Steam;
 using Serilog;
 using Serilog.Events;
 using System;
@@ -34,6 +35,7 @@ namespace Rc.DiscordBot
             DiscordBotAudioModule.ConfigureServices(hostContext, services);
             DiscordBotTwitchModule.ConfigureServices(hostContext, services);
             DiscordBotRssModule.ConfigureServices(hostContext, services);
+            DiscordBotSteamModule.ConfigureServices(hostContext, services);
 
             services.AddSingleton((IServiceProvider provider) =>
             {
@@ -43,6 +45,7 @@ namespace Rc.DiscordBot
                 commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotAudioModule))!).GetAwaiter().GetResult();
                 commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotTwitchModule))!).GetAwaiter().GetResult();
                 commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotRssModule))!).GetAwaiter().GetResult();
+                commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotSteamModule))!).GetAwaiter().GetResult();
 
                 return commandHandler;
             });
