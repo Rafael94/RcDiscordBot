@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+  <Import Project="..\..\configureawait.props" />
+  
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Rc.DiscordBot</RootNamespace>
+    <Configurations>Debug;Release;Windows;Linux</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SteamWebAPI2" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Rc.DiscordBot.Core\Rc.DiscordBot.Core.csproj" />
+  </ItemGroup>
+  
+</Project>

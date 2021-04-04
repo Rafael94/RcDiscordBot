@@ -65,7 +65,7 @@ namespace Rc.DiscordBot.Services
             switch (logMessage.Severity)
             {
                 case LogSeverity.Critical:
-                    _logger.LogCritical(logMessage.Exception,$"Source: {logMessage.Source} Message: {logMessage.Message}");
+                    _logger.LogCritical(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
                     break;
                 case LogSeverity.Error:
                     _logger.LogError(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
@@ -83,7 +83,7 @@ namespace Rc.DiscordBot.Services
                     _logger.LogDebug(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
                     break;
             }
- 
+
             return Task.CompletedTask;
         }
 
@@ -130,7 +130,10 @@ namespace Rc.DiscordBot.Services
         }
 
 
-        public void Dispose() => Dispose(true);
+        public void Dispose()
+        {
+            Dispose(true);
+        }
 
         private void Dispose(bool disposing)
         {

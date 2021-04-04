@@ -35,6 +35,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Rc.DiscordBot.Audio\Rc.DiscordBot.Audio.csproj" />
     <ProjectReference Include="..\Rc.DiscordBot.Rss\Rc.DiscordBot.Rss.csproj" />
+    <ProjectReference Include="..\Rc.DiscordBot.Steam\Rc.DiscordBot.Steam.csproj" />
     <ProjectReference Include="..\Rc.DiscordBot.Twitch\Rc.DiscordBot.Twitch.csproj" />
   </ItemGroup>
   

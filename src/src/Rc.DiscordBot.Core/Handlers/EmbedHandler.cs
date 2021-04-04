@@ -15,7 +15,9 @@ namespace Rc.DiscordBot.Handlers
             string description,
             Color color,
             IEnumerable<EmbedFieldBuilder>? fileds = null,
-            EmbedAuthorBuilder? author = null)
+            EmbedAuthorBuilder? author = null,
+            string? url = null,
+            string? imageUrl = null)
         {
             EmbedBuilder? builder = new EmbedBuilder()
                 .WithTitle(title)
@@ -34,12 +36,22 @@ namespace Rc.DiscordBot.Handlers
                 builder.WithAuthor(author);
             }
 
+            if(string.IsNullOrWhiteSpace(imageUrl) == false)
+            {
+                builder.WithImageUrl(imageUrl);
+            }
+
+            if (string.IsNullOrWhiteSpace(url) == false)
+            {
+                builder.WithUrl(url);
+            }
+
             return Task.FromResult(builder.Build());
         }
 
         public static EmbedBuilder WithBotFooter(this EmbedBuilder embedBuilder)
         {
-            return embedBuilder.WithFooter("Bot von Rafael Carnucci. https://twitch.tv/vincitorede");
+            return embedBuilder.WithFooter("Bot von Rafael Carnucci. https://github.com/Rafael94/DiscordBot");
         }
 
         /// <summary>
@@ -61,7 +73,7 @@ namespace Rc.DiscordBot.Handlers
                 .Replace("<li>", "", StringComparison.OrdinalIgnoreCase)
                 .Replace("<li/>", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
 
-            description = Regex.Replace(description, "<.*?>", String.Empty);
+            description = Regex.Replace(description, "<.*?>", string.Empty);
 
             if (description.Length > 2048)
             {

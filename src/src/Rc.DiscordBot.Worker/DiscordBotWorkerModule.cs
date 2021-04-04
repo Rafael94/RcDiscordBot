@@ -2,8 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Rc.DiscordBot.Handlers;
+using Rc.DiscordBot.Steam;
 using Serilog;
-using Serilog.Events;
 using System;
 using System.IO;
 using System.Reflection;
@@ -14,7 +14,7 @@ namespace Rc.DiscordBot
     {
         public static void ConfigureLog()
         {
-            var configuration = new ConfigurationBuilder()
+            IConfigurationRoot? configuration = new ConfigurationBuilder()
                .SetBasePath(Directory.GetCurrentDirectory())
                .AddJsonFile("appsettings.json")
                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", true)
@@ -34,6 +34,7 @@ namespace Rc.DiscordBot
             DiscordBotAudioModule.ConfigureServices(hostContext, services);
             DiscordBotTwitchModule.ConfigureServices(hostContext, services);
             DiscordBotRssModule.ConfigureServices(hostContext, services);
+            DiscordBotSteamModule.ConfigureServices(hostContext, services);
 
             services.AddSingleton((IServiceProvider provider) =>
             {
@@ -43,6 +44,7 @@ namespace Rc.DiscordBot
                 commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotAudioModule))!).GetAwaiter().GetResult();
                 commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotTwitchModule))!).GetAwaiter().GetResult();
                 commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotRssModule))!).GetAwaiter().GetResult();
+                commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotSteamModule))!).GetAwaiter().GetResult();
 
                 return commandHandler;
             });
