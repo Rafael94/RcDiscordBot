@@ -180,7 +180,7 @@ namespace Rc.DiscordBot.Services
                 {
                     TimeSpan estimatedTime = player.Track!.Duration - player.Track.Position;
 
-                    foreach (var queuedTrack in player.Queue)
+                    foreach (LavaTrack? queuedTrack in player.Queue)
                     {
                         estimatedTime += queuedTrack.Duration;
                     }
@@ -551,7 +551,7 @@ namespace Rc.DiscordBot.Services
                 return;
             }
 
-            if (!args.Player.Queue.TryDequeue(out LavaTrack ? track))
+            if (!args.Player.Queue.TryDequeue(out LavaTrack? track))
             {
                 await args.Player.TextChannel.SendMessageAsync("Playback Finished.");
             }

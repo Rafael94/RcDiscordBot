@@ -27,7 +27,7 @@ namespace Rc.DiscordBot.Handlers
             _botConfig = botConfig.Value;
             _logger = logger;
 
-            HookEvents();         
+            HookEvents();
         }
 
         /* Initialize the CommandService. */

@@ -6,7 +6,6 @@ using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Rc.DiscordBot.Modules
@@ -23,15 +22,15 @@ namespace Rc.DiscordBot.Modules
         }
 
         [Command("list")]
-        public async Task GetVersionAsync()
+        public async Task GetFeedListAsync()
         {
             List<EmbedFieldBuilder>? fileds = new();
 
-            for (var i = 0; i < _rssConfig.Feeds.Count; i++)
+            for (int i = 0; i < _rssConfig.Feeds.Count; i++)
             {
-                var feedConfig = _rssConfig.Feeds[i];
+                Models.Feed? feedConfig = _rssConfig.Feeds[i];
 
-                var discordServer = feedConfig.DiscordServers.Where(x => string.Equals(x.Name, Context.Guild.Name, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                MessageSendToDiscordServer? discordServer = feedConfig.DiscordServers.Where(x => string.Equals(x.Name, Context.Guild.Name, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                 fileds.Add(
                     new EmbedFieldBuilder()
@@ -49,7 +48,7 @@ namespace Rc.DiscordBot.Modules
         {
             List<EmbedFieldBuilder>? fileds = new();
 
-            var feedConfig = _rssConfig.Feeds.Where(x => string.Equals(x.Name, name, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            Models.Feed? feedConfig = _rssConfig.Feeds.Where(x => string.Equals(x.Name, name, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
             if (feedConfig == null)
             {
@@ -59,8 +58,8 @@ namespace Rc.DiscordBot.Modules
 
             CodeHollow.FeedReader.Feed? feedList = await FeedReader.ReadAsync(feedConfig.Url);
 
-            var i = 0;
-            foreach(var feedItem in feedList.Items)
+            int i = 0;
+            foreach (FeedItem? feedItem in feedList.Items)
             {
                 if (i >= anzahl || i >= feedList.Items.Count)
                 {

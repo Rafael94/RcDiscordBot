@@ -1,9 +1,7 @@
 ﻿using CodeHollow.FeedReader;
-using Discord;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
 using Rc.DiscordBot.Services;
 using System;
@@ -55,7 +53,7 @@ namespace Rc.DiscordBot
             {
                 CodeHollow.FeedReader.Feed? feedList = await FeedReader.ReadAsync(_rssConfig.Feeds[i].Url);
                 _logger.LogDebug($"Feed {_rssConfig.Feeds[i].Name} has {feedList.Items.Count} Entries. Last Update {feedList.LastUpdatedDate}");
-               
+
                 if (feedList.LastUpdatedDate < _lastCheck || feedList.Items?.Count == 0)
                 {
                     continue;

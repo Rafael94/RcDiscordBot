@@ -25,13 +25,13 @@ namespace Rc.DiscordBot
             {
                 Log.CloseAndFlush();
             }
-            
+
             return 0;
         }
 
         private static void ConfigureLog()
         {
-            var configuration = new ConfigurationBuilder()
+            IConfigurationRoot? configuration = new ConfigurationBuilder()
                .SetBasePath(Directory.GetCurrentDirectory())
                .AddJsonFile("appsettings.json")
                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")}.json", true)

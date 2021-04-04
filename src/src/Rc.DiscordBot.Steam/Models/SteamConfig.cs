@@ -7,7 +7,7 @@ namespace Rc.DiscordBot.Models
     {
         public TimeSpan Interval { get; set; } = TimeSpan.FromHours(2);
 
-        public string ApiKey { get; set; }
+        public string? ApiKey { get; set; }
 
         public List<News> News { get; set; } = new();
     }

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Hosting;
 using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Steam;
 using Serilog;
-using Serilog.Events;
 using System;
 using System.IO;
 using System.Reflection;
@@ -15,7 +14,7 @@ namespace Rc.DiscordBot
     {
         public static void ConfigureLog()
         {
-            var configuration = new ConfigurationBuilder()
+            IConfigurationRoot? configuration = new ConfigurationBuilder()
                .SetBasePath(Directory.GetCurrentDirectory())
                .AddJsonFile("appsettings.json")
                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", true)

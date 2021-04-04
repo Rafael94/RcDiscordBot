@@ -39,7 +39,7 @@ namespace Rc.DiscordBot
             }
             finally
             {
-              await   _discordService.StopAsync();
+                await _discordService.StopAsync();
             }
         }
     }

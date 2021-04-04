@@ -34,7 +34,7 @@ namespace Rc.DiscordBot.Modules
             EmbedBuilder? builder = new()
             {
                 Color = new Color(114, 137, 218),
-                Description = "Verfügbare Kommandos. Befehle zwischen {} sind Aliases. Parameter mit ? am Ende sind optional"
+                Description = "Verfügbare Kommandos. Befehle zwischen {} sind Aliases. Parameter mit ? am Ende sind optional. Parameter sind Fanken mit % an"
             };
 
             foreach (ModuleInfo? module in _service.Modules)
@@ -49,7 +49,7 @@ namespace Rc.DiscordBot.Modules
 
                         if (cmd.Parameters.Count > 0)
                         {
-                            description += ' ' + string.Join(' ', cmd.Parameters.Select(x => $"{x.Name}{(x.IsOptional ? '?' : "")}").ToList());
+                            description += ' ' + string.Join(' ', cmd.Parameters.Select(x => $"%{x.Name}{(x.IsOptional ? '?' : "")}").ToList());
                         }
 
                         if (cmd.Aliases.Count > 1)
