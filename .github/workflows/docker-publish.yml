@@ -33,4 +33,4 @@ jobs:
 
           docker tag $IMAGE_NAME $IMAGE_ID:latest
           docker tag $IMAGE_NAME $IMAGE_ID:${{ github.event.inputs.version }}
-          docker push $IMAGE_NAME --all-tags
+          docker push $IMAGE_ID --all-tags
