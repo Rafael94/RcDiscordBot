@@ -32,5 +32,6 @@ jobs:
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
           docker tag $IMAGE_NAME $IMAGE_ID:latest
-          docker tag $IMAGE_NAME $IMAGE_ID:${{ github.event.inputs.version }}
           docker push $IMAGE_ID:latest
+          docker tag $IMAGE_NAME $IMAGE_ID:${{ github.event.inputs.version }}
+          docker push $IMAGE_ID:${{ github.event.inputs.version }}
