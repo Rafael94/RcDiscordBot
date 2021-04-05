@@ -19,7 +19,7 @@ jobs:
         run: dotnet publish src/src/Rc.DiscordBot.Worker/Rc.DiscordBot.Worker.csproj -c Release -o publish
 
       - name: Build image
-        run: docker build --file src/src/Rc.DiscordBot.Worker/Dockerfile --tag $IMAGE_NAME --build-arg=PUBLISH_PATH=/home/runner/work/DiscordBot/DiscordBot/publish/ src/src/Rc.DiscordBot.Worker/
+        run: docker build --file src/src/Rc.DiscordBot.Worker/Dockerfile --tag $IMAGE_NAME --build-arg=PUBLISH_PATH=/home/runner/work/DiscordBot/DiscordBot/publish/ home/runner/work/DiscordBot/DiscordBot/publish/
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
