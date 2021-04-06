@@ -2,5 +2,4 @@
 ARG PUBLISH_PATH
 WORKDIR /app
 COPY $PUBLISH_PATH .
-VOLUME ["/app/appsettings.json"]
 ENTRYPOINT ["dotnet", "RcDiscordBot.dll"]
