@@ -36,18 +36,18 @@ namespace Rc.DiscordBot
             DiscordBotRssModule.ConfigureServices(hostContext, services);
             DiscordBotSteamModule.ConfigureServices(hostContext, services);
 
-            services.AddSingleton((IServiceProvider provider) =>
-            {
-                CommandHandler? commandHandler = (CommandHandler)ActivatorUtilities.CreateInstance(provider, typeof(CommandHandler));
+            //services.AddSingleton((IServiceProvider provider) =>
+            //{
+                //CommandHandler? commandHandler = (CommandHandler)ActivatorUtilities.CreateInstance(provider, typeof(CommandHandler));
 
-                commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotCoreModule))!).GetAwaiter().GetResult();
-                commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotAudioModule))!).GetAwaiter().GetResult();
-                commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotTwitchModule))!).GetAwaiter().GetResult();
-                commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotRssModule))!).GetAwaiter().GetResult();
-                commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotSteamModule))!).GetAwaiter().GetResult();
+                //commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotCoreModule))!).GetAwaiter().GetResult();
+                //commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotAudioModule))!).GetAwaiter().GetResult();
+               // commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotTwitchModule))!).GetAwaiter().GetResult();
+               //commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotRssModule))!).GetAwaiter().GetResult();
+                //commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotSteamModule))!).GetAwaiter().GetResult();
 
-                return commandHandler;
-            });
+                //return commandHandler;
+           // });
 
         }
     }

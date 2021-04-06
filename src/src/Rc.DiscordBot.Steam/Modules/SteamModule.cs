@@ -1,5 +1,7 @@
-﻿using Discord;
-using Discord.Commands;
+﻿
+using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
 using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
@@ -15,13 +17,12 @@ using System.Threading.Tasks;
 
 namespace Rc.DiscordBot.Modules
 {
-    [Name("Rss Feed")]
     [Group("Steam")]
-    public class SteamModule : ModuleBase<SocketCommandContext>
+    public class SteamModule : BaseCommandModule
     {
 
         [Group("News")]
-        public class News : ModuleBase<SocketCommandContext>
+        public class News : BaseCommandModule
         {
             private readonly SteamConfig _steamConfig;
 
@@ -31,31 +32,26 @@ namespace Rc.DiscordBot.Modules
             }
 
             [Command("list")]
-            [Summary("Listet die hinterlege News auf")]
-            public async Task GetNewsListAsync()
+            [Description("Listet die hinterlege News auf")]
+            public async Task GetNewsListAsync(CommandContext ctx)
             {
-                List<EmbedFieldBuilder>? fileds = new();
+                List<DiscordField>? fileds = new();
 
                 for (int i = 0; i < _steamConfig.News.Count; i++)
                 {
                     var newsConfig = _steamConfig.News[i];
 
-                    MessageSendToDiscordServer? discordServer = newsConfig.DiscordServers.Where(x => string.Equals(x.Name, Context.Guild.Name, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                    MessageSendToDiscordServer? discordServer = newsConfig.DiscordServers.Where(x => string.Equals(x.Name, ctx.Guild.Name, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
-                    fileds.Add(
-                        new EmbedFieldBuilder()
-                        .WithIsInline(false)
-                        .WithName($"{newsConfig.Name}  { (discordServer == null ? "" : " - " + discordServer.Channel + "")}")
-                        .WithValue(newsConfig.AppId)
-                        );
+                    fileds.Add(new DiscordField($"{newsConfig.Name}  { (discordServer == null ? "" : " - " + discordServer.Channel + "")}", newsConfig.AppId.ToString(), false) );
                 }
 
-                await ReplyAsync(embed: await EmbedHandler.CreateBasicEmbed("News", $"Hinterlegte RSS Feeds", Color.Blue, fileds));
+                await ctx.RespondAsync(embed: await EmbedHandler.CreateBasicEmbed("News", $"Hinterlegte RSS Feeds", DiscordColor.Blue, fileds));
             }
         }
 
         [Group("Game")]
-        public class Game : ModuleBase<SocketCommandContext>
+        public class Game : BaseCommandModule
         {
             private readonly SteamStore _steamStore;
             private readonly SteamWebInterfaceFactory _steamWebInterfaceFactory;
@@ -67,14 +63,14 @@ namespace Rc.DiscordBot.Modules
             }
 
             [Command("info")]
-            [Summary("Listet Spieleinformationen auf")]
-            public async Task GetNewsListAsync(uint gameId)
+            [Description("Listet Spieleinformationen auf")]
+            public async Task GetNewsListAsync(CommandContext ctx, uint gameId)
             {
                 var gameDetails = await _steamStore.GetStoreAppDetailsAsync(gameId);
 
                 if (gameDetails == null)
                 {
-                    await ReplyAsync(embed: await EmbedHandler.CreateErrorEmbed("steam game info", "Spiel wurde nicht gefunden"));
+                    await ctx.RespondAsync(embed: await EmbedHandler.CreateErrorEmbed("steam game info", "Spiel wurde nicht gefunden"));
                     return;
                 }
 
@@ -83,45 +79,41 @@ namespace Rc.DiscordBot.Modules
                 var curentPlayerCount = await steamInterface.GetNumberOfCurrentPlayersForGameAsync(gameId);
       
 
-                Embed embed = new EmbedBuilder()
+                DiscordEmbed embed = new DiscordEmbedBuilder()
                 .WithTitle("Informationen zum Spiel " + gameDetails.Name)
                 .WithCustomDescription(gameDetails.AboutTheGame)
                 .WithUrl(gameDetails.Website)
                 .WithImageUrl(gameDetails.HeaderImage)
                 .AddField("Preis", gameDetails.PriceOverview.FinalFormatted)
-                .AddField("Aktuelle Anzahl Spieler", curentPlayerCount.Data)
-                .AddField("Anzahl Bewertungen", gameDetails.Recommendations.Total)
+                .AddField("Aktuelle Anzahl Spieler", curentPlayerCount.Data.ToString())
+                .AddField("Anzahl Bewertungen", gameDetails.Recommendations.Total.ToString())
                 .AddField("Kategorien", string.Join(',', gameDetails.Categories.Select(x => x.Description)))
                 .AddField("Entwickler", string.Join(',', gameDetails.Developers))
                 .AddField("Genres", string.Join(',', gameDetails.Genres.Select(x => x.Description)))
-                .AddField("Kostenlos", gameDetails.IsFree)
+                .AddField("Kostenlos", gameDetails.IsFree.ToString())
                 .AddField("Publisher", string.Join(',', gameDetails.Publishers))
                 .AddField("Veröffentlichungsdatum", gameDetails.ReleaseDate.Date)
-                .WithColor(Color.Blue)
+                .WithColor(DiscordColor.Blue)
                 .WithBotFooter()
                 .Build();
 
-                await ReplyAsync(embed: embed);
+                await ctx.RespondAsync(embed: embed);
             }
 
             [Command("find")]
-            [Summary("Gibt die AppId des Spiels zurück (Maximal 15 Einträge)")]
-            public async Task GetFindAppIdAsync([Remainder] string name)
+            [Description("Gibt die AppId des Spiels zurück (Maximal 15 Einträge)")]
+            public async Task GetFindAppIdAsync(CommandContext ctx, [RemainingText] string name)
             {
 
                 var steamInterface = _steamWebInterfaceFactory.CreateSteamWebInterface<SteamApps>(new HttpClient());
                 var games = await steamInterface.GetAppListAsync();
-                List<EmbedFieldBuilder> fileds = new();
+                List<DiscordField> fileds = new();
 
                 foreach(var game in games.Data)
                 {
                     if(game.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase))
                     {
-                        fileds.Add(new()
-                        {
-                            Name = game.Name,
-                            Value = game.AppId
-                        });
+                        fileds.Add(new(game.Name, game.AppId.ToString()));
 
                         if (fileds.Count >= 15)
                         {
@@ -130,12 +122,12 @@ namespace Rc.DiscordBot.Modules
                     }
                 }
 
-                await ReplyAsync(embed: await EmbedHandler.CreateBasicEmbed("Folgende Spiele wurden gefunden", "Es werden nur maximal 15 Einträge zurückgegeben", Color.Blue, fileds));
+                await ctx.RespondAsync(embed: await EmbedHandler.CreateBasicEmbed("Folgende Spiele wurden gefunden", "Es werden nur maximal 15 Einträge zurückgegeben", DiscordColor.Blue, fileds));
             }
         }
 
         [Group("Player")]
-        public class Player : ModuleBase<SocketCommandContext>
+        public class Player : BaseCommandModule
         {
             private readonly SteamWebInterfaceFactory _steamWebInterfaceFactory;
 
@@ -145,29 +137,29 @@ namespace Rc.DiscordBot.Modules
             }
 
             [Command("info")]
-            public async Task GetNewsListAsync(ulong userId)
+            public async Task GetNewsListAsync(CommandContext ctx, ulong userId)
             {
                 var steamInterface = _steamWebInterfaceFactory.CreateSteamWebInterface<SteamUser>(new HttpClient());
                 var playerSummary = await steamInterface.GetPlayerSummaryAsync(userId);
 
                 if (playerSummary?.Data == null)
                 {
-                    await ReplyAsync(embed: await EmbedHandler.CreateErrorEmbed("steam player info", "Benutzer wurde nicht gefunden"));
+                    await ctx.RespondAsync(embed: await EmbedHandler.CreateErrorEmbed("steam player info", "Benutzer wurde nicht gefunden"));
                     return;
                 }
 
-                List<EmbedFieldBuilder> fields = new()
+                List<DiscordField>? fields = new()
                 {                        
-                    new EmbedFieldBuilder().WithName("Benutzer Status").WithValue(playerSummary.Data.UserStatus.ToString()),
-                    new EmbedFieldBuilder().WithName("Bei Steam seit").WithValue(playerSummary.Data.AccountCreatedDate),
+                    new DiscordField("Benutzer Status", playerSummary.Data.UserStatus.ToString()),
+                    new DiscordField("Bei Steam seit",playerSummary.Data.AccountCreatedDate.ToString())
                 };
 
                 if(string.IsNullOrWhiteSpace(playerSummary.Data.PlayingGameName) == false)
                 {
-                    fields.Add(new EmbedFieldBuilder().WithName("Aktuelles Spiel").WithValue(playerSummary.Data.PlayingGameName));
+                    fields.Add(new DiscordField("Aktuelles Spiel", playerSummary.Data.PlayingGameName));
                 }
 
-                await ReplyAsync(embed: await EmbedHandler.CreateBasicEmbed("Spieler " + playerSummary.Data.Nickname, $"Informationen zum Benutzer", Color.Blue, fields, url: playerSummary.Data.ProfileUrl, imageUrl: playerSummary.Data.AvatarFullUrl));
+                await ctx.RespondAsync(embed: await EmbedHandler.CreateBasicEmbed("Spieler " + playerSummary.Data.Nickname, $"Informationen zum Benutzer", DiscordColor.Blue, fields, url: playerSummary.Data.ProfileUrl, imageUrl: playerSummary.Data.AvatarFullUrl));
             }
         }
     }

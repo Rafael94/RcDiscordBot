@@ -1,5 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
+﻿
 using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
@@ -9,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Rc.DiscordBot.Modules
 {
-    [Name("Help")]
+    /*[Name("Help")]
     public class HelpModule : ModuleBase<SocketCommandContext>
     {
         private readonly CommandService _service;
@@ -122,5 +121,5 @@ namespace Rc.DiscordBot.Modules
 
             await ReplyAsync("", false, builder.Build());
         }
-    }
+    }*/
 }

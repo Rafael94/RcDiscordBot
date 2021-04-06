@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
 using Rc.DiscordBot.Services;
+using System.Reflection;
 
 namespace Rc.DiscordBot
 {
@@ -22,6 +24,8 @@ namespace Rc.DiscordBot
                 return;
             }
 
+            services.PostConfigure<CommandHandler>((commandHandler) => commandHandler.Assemblies.Add(Assembly.GetExecutingAssembly()));
+            
             services.Configure<TwitchConfig>(options => hostContext.Configuration.GetSection("Twitch").Bind(options));
 
             services.AddSingleton<TwitchLiveMonitorService>();

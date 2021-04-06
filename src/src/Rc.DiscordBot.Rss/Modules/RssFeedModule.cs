@@ -1,6 +1,7 @@
 ﻿using CodeHollow.FeedReader;
-using Discord;
-using Discord.Commands;
+using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
 using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
@@ -10,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace Rc.DiscordBot.Modules
 {
-    [Name("Rss Feed")]
-    [Group("Rss")]
-    public class RssFeedModule : ModuleBase<SocketCommandContext>
+    
+    [Group("rss")]
+    public class RssFeedModule : BaseCommandModule
     {
         private readonly RssConfig _rssConfig;
 
@@ -22,37 +23,34 @@ namespace Rc.DiscordBot.Modules
         }
 
         [Command("list")]
-        public async Task GetFeedListAsync()
+        [Description("Listet die hinterlegten RSS Feeds auf")]
+        public async Task GetFeedListAsync(CommandContext ctx)
         {
-            List<EmbedFieldBuilder>? fileds = new();
+            List<DiscordField>? fileds = new();
 
             for (int i = 0; i < _rssConfig.Feeds.Count; i++)
             {
                 Models.Feed? feedConfig = _rssConfig.Feeds[i];
 
-                MessageSendToDiscordServer? discordServer = feedConfig.DiscordServers.Where(x => string.Equals(x.Name, Context.Guild.Name, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                MessageSendToDiscordServer? discordServer = feedConfig.DiscordServers.Where(x => string.Equals(x.Name ,ctx.Guild.Name, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                 fileds.Add(
-                    new EmbedFieldBuilder()
-                    .WithIsInline(false)
-                    .WithName($"{feedConfig.Name}  { (discordServer == null ? "" : " - " + discordServer.Channel + "")}")
-                    .WithValue(feedConfig.Url)
-                    );
+                    new DiscordField($"{feedConfig.Name}  { (discordServer == null ? "" : " - " + discordServer.Channel + "")}", feedConfig.Url, false));
             }
 
-            await ReplyAsync(embed: await EmbedHandler.CreateBasicEmbed("Feeds", $"Hinterlegte RSS Feeds", Color.Blue, fileds));
+            await ctx.RespondAsync(embed: await EmbedHandler.CreateBasicEmbed("Feeds", $"Hinterlegte RSS Feeds", DiscordColor.Blue, fileds));
         }
 
         [Command("read")]
-        public async Task ReadAsync(string name, int anzahl = 1)
+        public async Task ReadAsync(CommandContext ctx, string name, int anzahl = 1)
         {
-            List<EmbedFieldBuilder>? fileds = new();
+            List<DiscordField>? fileds = new();
 
             Models.Feed? feedConfig = _rssConfig.Feeds.Where(x => string.Equals(x.Name, name, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
             if (feedConfig == null)
             {
-                await ReplyAsync(embed: await EmbedHandler.CreateErrorEmbed("RSS Red", "Feed not found"));
+                await ctx.RespondAsync(embed: await EmbedHandler.CreateErrorEmbed("RSS Red", "Feed not found"));
                 return;
             }
 
@@ -66,11 +64,10 @@ namespace Rc.DiscordBot.Modules
                     break;
                 }
 
-                await ReplyAsync(embed: RssEmbedHelper.CreateEmbed(feedConfig.Name, feedItem));
+                await ctx.RespondAsync(embed: RssEmbedHelper.CreateEmbed(feedConfig.Name, feedItem));
 
                 ++i;
             }
         }
-
     }
 }
