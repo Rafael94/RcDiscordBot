@@ -7,6 +7,7 @@
     <RepositoryUrl>https://github.com/Rafael94/DiscordBot</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile> -->
 
     <!-- https://github.com/dotnet/sourcelink -->

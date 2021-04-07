@@ -3,27 +3,34 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using DSharpPlus.Lavalink;
-using Rc.DiscordBot.Services;
+using Lavalink4NET;
+using Lavalink4NET.Player;
+using Lavalink4NET.Rest;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Rc.DiscordBot.Handlers;
+using Rc.DiscordBot.Models;
 using System;
-using System.Linq;
-using System.Linq.Expressions;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Rc.DiscordBot.Modules
 {
 
-    public class AudioModule : DSharpPlus.CommandsNext.BaseCommandModule
+    public class AudioModule : BaseCommandModule
     {
+        private readonly Lazy<IAudioService> _audioService;
+        private readonly AudioConfig _audioConfig;
+
+        public AudioModule(Lazy<IAudioService> audioService, IOptions<AudioConfig> audioConfig)
+        {
+            _audioService = audioService;
+            _audioConfig = audioConfig.Value;
+        }
+
         [Command("join")]
         public async Task JoinAsync(CommandContext ctx)
         {
-            var lava = ctx.Client.GetLavalink();
-            if (!lava.ConnectedNodes.Any())
-            {
-                await ctx.RespondAsync("The Lavalink connection is not established");
-                return;
-            }
             var channel = ctx.Member.VoiceState.Channel;
 
             if (channel.Type != ChannelType.Voice)
@@ -31,119 +38,198 @@ namespace Rc.DiscordBot.Modules
                 await ctx.RespondAsync("Not a valid voice channel.");
                 return;
             }
-            var node = lava.ConnectedNodes.Values.First();
-            await node.ConnectAsync(channel);
-            await ctx.RespondAsync($"Joined {channel.Name}!");
+
+            await _audioService.Value.JoinAsync<QueuedLavalinkPlayer>(ctx.Guild.Id, channel.Id, false, false);
+        }
+
+        [Command("join")]
+        [Description("Den Bot zum aktuellen Channel")]
+        public async Task JoinAsync(CommandContext ctx, DiscordChannel channel)
+        {
+            if (channel.Type != ChannelType.Voice)
+            {
+                await ctx.RespondAsync("Not a valid voice channel.");
+                return;
+            }
+
+            await _audioService.Value.JoinAsync<QueuedLavalinkPlayer>(ctx.Guild.Id, channel.Id, false, false);
         }
 
         [Command("leave")]
+        [Aliases("stop")]
         public async Task LeaveAsync(CommandContext ctx)
         {
-            var lava = ctx.Client.GetLavalink();
-            if (!lava.ConnectedNodes.Any())
-            {
-                await ctx.RespondAsync("The Lavalink connection is not established");
-                return;
-            }
-            var channel = ctx.Member.VoiceState.Channel;
-            if (channel.Type != ChannelType.Voice)
-            {
-                await ctx.RespondAsync("Not a valid voice channel.");
-                return;
-            }
+            var player = _audioService.Value.GetPlayer(ctx.Guild.Id);
 
-            var node = lava.ConnectedNodes.Values.First();
-            var conn = node.GetGuildConnection(channel.Guild);
-
-            if (conn == null)
+            if (player != null)
             {
-                await ctx.RespondAsync("Lavalink is not connected.");
-                return;
+                await player.DisconnectAsync();
             }
-
-            await conn.DisconnectAsync();
-            await ctx.RespondAsync($"Left {channel.Name}!");
         }
 
-        [Command]
-        public async Task Play(CommandContext ctx, [RemainingText] string search)
+        [Command("play")]
+        public async Task PlayAsync(CommandContext ctx, [RemainingText] string search)
         {
-            //Important to check the voice state itself first, 
-            //as it may throw a NullReferenceException if they don't have a voice state.
-            if (ctx.Member.VoiceState == null || ctx.Member.VoiceState.Channel == null)
+            var player = _audioService.Value.GetPlayer<QueuedLavalinkPlayer>(ctx.Guild.Id);
+
+            if (player == null)
             {
-                await ctx.RespondAsync("You are not in a voice channel.");
                 return;
             }
+            LavalinkTrack? track;
 
-            var lava = ctx.Client.GetLavalink();
-            var node = lava.ConnectedNodes.Values.First();
-            var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
-
-            if (conn == null)
-            {
-                await ctx.RespondAsync("Lavalink is not connected.");
-                return;
-            }
-            LavalinkLoadResult? loadResult;
-
-            //We don't need to specify the search type here
-            //since it is YouTube by default.
             if (search.StartsWith("http"))
             {
-                loadResult = await node.Rest.GetTracksAsync(new Uri(search));
+                track = await _audioService.Value.GetTrackAsync(search, SearchMode.None);
             }
             else
             {
-                loadResult = await node.Rest.GetTracksAsync(search);
+                track = await _audioService.Value.GetTrackAsync(search, SearchMode.YouTube);
+
+                if (track == null)
+                {
+                    track = await _audioService.Value.GetTrackAsync(search, SearchMode.SoundCloud);
+                }
             }
 
-
-            //If something went wrong on Lavalink's end                          
-            if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed
-
-                //or it just couldn't find anything.
-                || loadResult.LoadResultType == LavalinkLoadResultType.NoMatches)
+            if (track == null)
             {
-                await ctx.RespondAsync($"Track search failed for {search}.");
                 return;
             }
 
-            var track = loadResult.Tracks.First();
-
-            await conn.PlayAsync(track);
-
-            await ctx.RespondAsync($"Now playing {track.Title}!");
+            await player.PlayAsync(track);
         }
 
-        [Command]
-        public async Task Pause(CommandContext ctx)
+        [Command("pause")]
+        public async Task PauseAsync(CommandContext ctx)
         {
-            if (ctx.Member.VoiceState == null || ctx.Member.VoiceState.Channel == null)
+            var player = _audioService.Value.GetPlayer<QueuedLavalinkPlayer>(ctx.Guild.Id);
+
+            if (player == null)
             {
-                await ctx.RespondAsync("You are not in a voice channel.");
                 return;
             }
 
-            var lava = ctx.Client.GetLavalink();
-            var node = lava.ConnectedNodes.Values.First();
-            var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
-
-            if (conn == null)
-            {
-                await ctx.RespondAsync("Lavalink is not connected.");
-                return;
-            }
-
-            if (conn.CurrentState.CurrentTrack == null)
-            {
-                await ctx.RespondAsync("There are no tracks loaded.");
-                return;
-            }
-
-            await conn.PauseAsync();
+            player.PauseAsync();
         }
 
+        [Command("resume")]
+        public async Task ResumeAsync(CommandContext ctx)
+        {
+            var player = _audioService.Value.GetPlayer<QueuedLavalinkPlayer>(ctx.Guild.Id);
+
+            if (player == null)
+            {
+                return;
+            }
+
+            await player.ResumeAsync();
+        }
+
+        [Command("skip")]
+        public async Task Volume(CommandContext ctx, float volume)
+        {
+            var player = _audioService.Value.GetPlayer<QueuedLavalinkPlayer>(ctx.Guild.Id);
+
+            if (player == null)
+            {
+                return;
+            }
+
+            if (volume < 0 || volume > 1)
+            {
+                return;
+            }
+
+
+            player.SetVolumeAsync(volume);
+        }
+
+        [Command("ListStreams")]
+        public async Task ListStreamsAsync(CommandContext ctx)
+        {
+            DiscordEmbedBuilder builder = new();
+
+            builder
+                .WithColor(DiscordColor.Blue)
+                .WithCurrentTimestamp()
+                .WithTitle("Verfügbare Streams");
+
+            foreach (StreamConfig? stream in _audioConfig.Streams)
+            {
+                string? key = stream.Name;
+                if (string.IsNullOrEmpty(stream.DisplayName) == false)
+                {
+                    key = key + " - " + stream.DisplayName;
+                }
+
+                builder.AddField(key, stream.Url, false);
+            }
+
+            await ctx.RespondAsync(builder.Build());
+        }
+
+        [Command("Stream")]
+        public async Task PlayStreamAsync(CommandContext ctx, string stream)
+        {
+            var player = _audioService.Value.GetPlayer<QueuedLavalinkPlayer>(ctx.Guild.Id);
+
+            if (player == null)
+            {
+                await ctx.RespondAsync(await EmbedHandler.CreateErrorEmbed("Music, Play", "You Must First Join a Voice Channel."));
+                return;
+            }
+
+            if (stream.StartsWith("http"))
+            {
+                await ctx.RespondAsync(await EmbedHandler.CreateErrorEmbed("Music, Play", "Please specify the stream name"));
+                return;
+            }
+
+            StreamConfig? audioStream = null;
+            for (int i = 0; i < _audioConfig.Streams.Count; i++)
+            {
+                if (string.Equals(stream, _audioConfig.Streams[i].Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    audioStream = _audioConfig.Streams[i];
+                    break;
+                }
+            }
+
+            if (audioStream == null)
+            {
+                await ctx.RespondAsync(await EmbedHandler.CreateErrorEmbed("Music, Play", $"No Stream with the name {stream} found"));
+                return;
+            }
+
+            var track = await _audioService.Value.GetTrackAsync(audioStream.Url, SearchMode.None);
+
+            //If we couldn't find anything, tell the user.
+            if (track == null)
+            {
+                await ctx.RespondAsync(await EmbedHandler.CreateErrorEmbed("Music", $"I wasn't able to find anything for {audioStream.Url}."));
+                return;
+            }
+
+            var queueCount = await player.PlayAsync(track);
+
+            if (queueCount > 0)
+            {
+                await ctx.RespondAsync(await EmbedHandler.CreateBasicEmbed("Music", $"{track!.Title} has been added to queue.", DiscordColor.Blue));
+            }
+            else
+            {
+                List<DiscordField> fields = new()
+                {
+                    new DiscordField("Channel", ctx.Guild.GetChannel(player.VoiceChannelId.Value).Name)
+                };
+
+                DiscordAuthor author = new DiscordAuthor(ctx.User.Username, IconUrl: ctx.User.AvatarUrl);
+
+                await ctx.RespondAsync(await EmbedHandler.CreateBasicEmbed("Music", $"Now Playing: {track!.Title}\nUrl: {track.Source}", DiscordColor.Blue, fields, author));
+
+            }
+        }
     }
 
 
@@ -157,36 +243,6 @@ namespace Rc.DiscordBot.Modules
             _audioService = lavaLinkAudio;
         }
 
-        [Command("Join")]
-        [Summary("Den Bot zum aktuellen Channel")]
-        public async Task JoinAndPlay()
-        {
-            await ReplyAsync(embed: await _audioService.JoinAsync(Context.Guild, (Context.User as IVoiceState)!, (Context.Channel as ITextChannel)!));
-        }
-
-        [Command("Leave")]
-        public async Task Leave()
-        {
-            await ReplyAsync(embed: await _audioService.LeaveAsync(Context.Guild));
-        }
-
-        [Command("Play")]
-        public async Task Play([Remainder] string search)
-        {
-            await ReplyAsync(embed: await _audioService.PlayAsync((Context.User as SocketGuildUser)!, Context.Guild, search));
-        }
-
-        [Command("SC"), Alias("SoundCloud"), Summary("Such den Track in SoundCloud")]
-        public async Task PlaySoundCloud([Remainder] string search)
-        {
-            await ReplyAsync(embed: await _audioService.PlayAsync((Context.User as SocketGuildUser)!, Context.Guild, search, LavaLinkAudio.FallbackSearch.SoundCloud));
-        }
-
-        [Command("Stop")]
-        public async Task Stop()
-        {
-            await ReplyAsync(embed: await _audioService.StopAsync(Context.Guild));
-        }
 
         [Command("List")]
         public async Task List()
@@ -200,35 +256,8 @@ namespace Rc.DiscordBot.Modules
             await ReplyAsync(embed: await _audioService.SkipTrackAsync(Context.Guild));
         }
 
-        [Command("Volume")]
-        public async Task Volume(int volume)
-        {
-            await ReplyAsync(await _audioService.SetVolumeAsync(Context.Guild, volume));
-        }
 
-        [Command("Pause")]
-        public async Task Pause()
-        {
-            await ReplyAsync(await _audioService.PauseAsync(Context.Guild));
-        }
-
-        [Command("Resume")]
-        public async Task Resume()
-        {
-            await ReplyAsync(await _audioService.ResumeAsync(Context.Guild));
-        }
-
-        [Command("ListStreams")]
-        public async Task ListStreams()
-        {
-            await ReplyAsync(embed: await _audioService.ListAvailableStreamsAsync());
-        }
-
-        [Command("Stream")]
-        public async Task PlayStream(string stream)
-        {
-            await ReplyAsync(embed: await _audioService.PlayStreamAsync((Context.User as SocketGuildUser)!, Context.Guild, stream));
-        }
+    
 
         [Command("ClearPlaylist")]
         public async Task ClearPlaylist()

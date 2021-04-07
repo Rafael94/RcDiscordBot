@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
 using Rc.DiscordBot.Services;
+using System;
 
 namespace Rc.DiscordBot
 {
@@ -45,6 +46,7 @@ namespace Rc.DiscordBot
                 return client;
             });
 
+            services.AddTransient(typeof(Lazy<>), typeof(Lazier<>));
         }
     }
 }

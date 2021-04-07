@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Lava4LinkNet\Lavalink4NET.DSharpPlus\Lavalink4NET.DSharpPlus.csproj" />
     <ProjectReference Include="..\Rc.DiscordBot.Core\Rc.DiscordBot.Core.csproj" />
-    <PackageReference Include="DSharpPlus.Lavalink" Version="4.0.0-rc3" />
   </ItemGroup>
 
 </Project>
