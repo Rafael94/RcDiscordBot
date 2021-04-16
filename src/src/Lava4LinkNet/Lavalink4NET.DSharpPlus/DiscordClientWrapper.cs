@@ -171,6 +171,10 @@ namespace Lavalink4NET.DSharpPlus
         private Task OnVoiceServerUpdated(DiscordClient _, VoiceServerUpdateEventArgs voiceServer)
         {
             EnsureNotDisposed();
+            if(voiceServer.Endpoint == null)
+            {
+                return Task.CompletedTask;
+            }
 
             var args = new VoiceServer(voiceServer.Guild.Id, voiceServer.GetVoiceToken(), voiceServer.Endpoint);
             return VoiceServerUpdated.InvokeAsync(this, args);

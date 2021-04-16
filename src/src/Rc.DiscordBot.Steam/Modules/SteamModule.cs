@@ -46,7 +46,10 @@ namespace Rc.DiscordBot.Modules
                     fileds.Add(new DiscordField($"{newsConfig.Name}  { (discordServer == null ? "" : " - " + discordServer.Channel + "")}", newsConfig.AppId.ToString(), false) );
                 }
 
-                await ctx.RespondAsync(embed: await EmbedHandler.CreateBasicEmbed("News", $"Hinterlegte RSS Feeds", DiscordColor.Blue, fileds));
+                await new DiscordMessageBuilder()
+                  .WithEmbed(EmbedHandler.CreateBasicEmbed("News", $"Hinterlegte RSS Feeds", DiscordColor.Blue))
+                  .WithReply(ctx.Message.Id, true)
+                  .SendAsync(ctx.Channel);
             }
         }
 
@@ -70,7 +73,11 @@ namespace Rc.DiscordBot.Modules
 
                 if (gameDetails == null)
                 {
-                    await ctx.RespondAsync(embed: await EmbedHandler.CreateErrorEmbed("steam game info", "Spiel wurde nicht gefunden"));
+                    await new DiscordMessageBuilder()
+                     .WithEmbed(EmbedHandler.CreateErrorEmbed("Steam game info", "Spiel wurde nicht gefunden"))
+                     .WithReply(ctx.Message.Id, true)
+                     .SendAsync(ctx.Channel);
+
                     return;
                 }
 
@@ -97,7 +104,10 @@ namespace Rc.DiscordBot.Modules
                 .WithBotFooter()
                 .Build();
 
-                await ctx.RespondAsync(embed: embed);
+                await new DiscordMessageBuilder()
+                 .WithEmbed(embed)
+                 .WithReply(ctx.Message.Id, true)
+                 .SendAsync(ctx.Channel);
             }
 
             [Command("find")]
@@ -122,7 +132,10 @@ namespace Rc.DiscordBot.Modules
                     }
                 }
 
-                await ctx.RespondAsync(embed: await EmbedHandler.CreateBasicEmbed("Folgende Spiele wurden gefunden", "Es werden nur maximal 15 Einträge zurückgegeben", DiscordColor.Blue, fileds));
+                await new DiscordMessageBuilder()
+                   .WithEmbed(EmbedHandler.CreateBasicEmbed("Folgende Spiele wurden gefunden", "Es werden nur maximal 15 Einträge zurückgegeben", DiscordColor.Blue, fileds))
+                   .WithReply(ctx.Message.Id, true)
+                   .SendAsync(ctx.Channel);
             }
         }
 
@@ -144,7 +157,11 @@ namespace Rc.DiscordBot.Modules
 
                 if (playerSummary?.Data == null)
                 {
-                    await ctx.RespondAsync(embed: await EmbedHandler.CreateErrorEmbed("steam player info", "Benutzer wurde nicht gefunden"));
+                    await new DiscordMessageBuilder()
+                     .WithEmbed(EmbedHandler.CreateErrorEmbed("steam player info", "Benutzer wurde nicht gefunden"))
+                     .WithReply(ctx.Message.Id, true)
+                     .SendAsync(ctx.Channel);
+
                     return;
                 }
 
@@ -159,7 +176,11 @@ namespace Rc.DiscordBot.Modules
                     fields.Add(new DiscordField("Aktuelles Spiel", playerSummary.Data.PlayingGameName));
                 }
 
-                await ctx.RespondAsync(embed: await EmbedHandler.CreateBasicEmbed("Spieler " + playerSummary.Data.Nickname, $"Informationen zum Benutzer", DiscordColor.Blue, fields, url: playerSummary.Data.ProfileUrl, imageUrl: playerSummary.Data.AvatarFullUrl));
+                await new DiscordMessageBuilder()
+                  .WithEmbed(EmbedHandler.CreateBasicEmbed("Spieler " + playerSummary.Data.Nickname, $"Informationen zum Benutzer", DiscordColor.Blue, fields, url: playerSummary.Data.ProfileUrl, imageUrl: playerSummary.Data.AvatarFullUrl))
+                  .WithReply(ctx.Message.Id, true)
+                  .SendAsync(ctx.Channel);
+          
             }
         }
     }

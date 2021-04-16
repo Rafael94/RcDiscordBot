@@ -3,6 +3,7 @@ using DSharpPlus.EventArgs;
 using Lavalink4NET;
 using Lavalink4NET.Player;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Models;
 using System;
@@ -18,12 +19,14 @@ namespace Rc.DiscordBot
     {
         private readonly DiscordClient _discordClient;
         private readonly IAudioService _audioService;
+        private readonly ILogger<AudioHostedService> _logger;
 
 
-        public AudioHostedService(DiscordClient discordClient, IAudioService audioService)
+        public AudioHostedService(DiscordClient discordClient, IAudioService audioService, ILogger<AudioHostedService> logger)
         {
             _discordClient = discordClient;
             _audioService = audioService;
+            _logger = logger;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -33,7 +36,16 @@ namespace Rc.DiscordBot
             {
                 return Task.Factory.StartNew(async () =>
                   {
-                      await _audioService.InitializeAsync();
+                      try
+                      {
+                          await _audioService.InitializeAsync();
+                      }
+                      catch (Exception ex)
+                      {
+
+                          _logger.LogError("Error by AudioService InitializeAsync", ex);
+                      }
+                    
                   });
             };
 

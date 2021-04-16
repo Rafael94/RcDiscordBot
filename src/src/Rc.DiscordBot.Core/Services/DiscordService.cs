@@ -47,6 +47,18 @@ namespace Rc.DiscordBot.Services
         private void SubscribeDiscordEvents()
         {
             Client.Ready += ReadyAsync;
+
+            Client.ClientErrored += (DiscordClient client, ClientErrorEventArgs args) =>
+            {
+                _logger.LogError("Cleint Error", args.Exception);
+                return Task.CompletedTask;
+            };
+
+            Client.SocketErrored += (DiscordClient client, SocketErrorEventArgs args) =>
+            {
+                _logger.LogError("Socket Error", args.Exception);
+                return Task.CompletedTask;
+            };
         }
 
         private async Task ReadyAsync(DiscordClient client, ReadyEventArgs args)

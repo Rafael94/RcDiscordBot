@@ -38,7 +38,10 @@ namespace Rc.DiscordBot.Modules
                     new DiscordField($"{feedConfig.Name}  { (discordServer == null ? "" : " - " + discordServer.Channel + "")}", feedConfig.Url, false));
             }
 
-            await ctx.RespondAsync(embed: await EmbedHandler.CreateBasicEmbed("Feeds", $"Hinterlegte RSS Feeds", DiscordColor.Blue, fileds));
+            await new DiscordMessageBuilder()
+                 .WithEmbed(EmbedHandler.CreateBasicEmbed("Feeds", $"Hinterlegte RSS Feeds", DiscordColor.Green, fileds))
+                 .WithReply(ctx.Message.Id, true)
+                 .SendAsync(ctx.Channel);
         }
 
         [Command("read")]
@@ -50,7 +53,11 @@ namespace Rc.DiscordBot.Modules
 
             if (feedConfig == null)
             {
-                await ctx.RespondAsync(embed: await EmbedHandler.CreateErrorEmbed("RSS Red", "Feed not found"));
+                await new DiscordMessageBuilder()
+                 .WithEmbed(EmbedHandler.CreateErrorEmbed("RSS Red", "Feed not found"))
+                 .WithReply(ctx.Message.Id, true)
+                 .SendAsync(ctx.Channel);
+
                 return;
             }
 
@@ -64,7 +71,10 @@ namespace Rc.DiscordBot.Modules
                     break;
                 }
 
-                await ctx.RespondAsync(embed: RssEmbedHelper.CreateEmbed(feedConfig.Name, feedItem));
+                await new DiscordMessageBuilder()
+                    .WithEmbed(RssEmbedHelper.CreateEmbed(feedConfig.Name, feedItem))
+                    .WithReply(ctx.Message.Id, true)
+                    .SendAsync(ctx.Channel);
 
                 ++i;
             }

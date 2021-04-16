@@ -22,7 +22,6 @@ namespace Rc.DiscordBot
                 .Configure<AudioConfig>(options => hostContext.Configuration.GetSection("Audio").Bind(options))
                 .Configure<LavaConfig>(options => hostContext.Configuration.GetSection("Lavalink").Bind(options))
                 .PostConfigure<CommandHandler>((commandHandler) => commandHandler.Assemblies.Add(Assembly.GetExecutingAssembly()))
-                .AddSingleton<LavaLinkAudio>()
                 .AddSingleton<IHostedService, AudioHostedService>()
                 .AddSingleton<IAudioService, LavalinkNode>()
                 .AddSingleton<IDiscordClientWrapper, DiscordClientWrapper>()
