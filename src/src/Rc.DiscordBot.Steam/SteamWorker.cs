@@ -31,7 +31,7 @@ namespace Rc.DiscordBot
         private readonly DiscordService _discordService;
         private readonly SteamStore _steamStore;
 
-        private DateTime _lastCheck = DateTime.Now;
+        private DateTimeOffset _lastCheck = DateTimeOffset.Now;
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -40,7 +40,7 @@ namespace Rc.DiscordBot
             {
                 stoppingToken.ThrowIfCancellationRequested();
                 _logger.LogInformation($"Init Steam News Timer with Intervall {_steamConfig.Interval}");
-                using Timer? timer = new(HandleTimerCallback, null, _steamConfig.Interval, _steamConfig.Interval);
+                using Timer? timer = new(HandleTimerCallback, null, TimeSpan.Zero, _steamConfig.Interval);
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
@@ -85,7 +85,7 @@ namespace Rc.DiscordBot
                     await SendMessageAsync(_steamConfig.News[i], gameDetails, news, date);
                 }
             }
-            _lastCheck = DateTime.Now;
+            _lastCheck = DateTimeOffset.Now;
         }
 
         private async Task SendMessageAsync(News newsConfig, StoreAppDetailsDataModel app, NewsItemModel item, DateTimeOffset date)
