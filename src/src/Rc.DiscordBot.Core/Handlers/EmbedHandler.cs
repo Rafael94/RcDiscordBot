@@ -13,7 +13,7 @@ namespace Rc.DiscordBot.Handlers
         /* This file is where we can store all the Embed Helper Tasks (So to speak). 
              We wrap all the creations of new EmbedBuilder's in a Task.Run to allow us to stick with Async calls. 
              All the Tasks here are also static which means we can call them from anywhere in our program. */
-        public static Task<DiscordEmbed> CreateBasicEmbed(string title,
+        public static DiscordEmbed CreateBasicEmbed(string title,
             string description,
             DiscordColor color,
             IEnumerable<DiscordField>? fields = null,
@@ -49,7 +49,7 @@ namespace Rc.DiscordBot.Handlers
                 builder.WithUrl(url);
             }
 
-            return Task.FromResult(builder.Build());
+            return builder.Build();
         }
 
         public static DiscordEmbedBuilder WithBotFooter(this DiscordEmbedBuilder embedBuilder)
@@ -106,14 +106,13 @@ namespace Rc.DiscordBot.Handlers
             return embedBuilder.WithDescription(description);
         }
 
-        public static async Task<DiscordEmbed> CreateErrorEmbed(string source, string error)
+        public static  DiscordEmbed CreateErrorEmbed(string source, string error)
         {
-            DiscordEmbed? embed = await Task.Run(() => new DiscordEmbedBuilder()
+            return new DiscordEmbedBuilder()
                 .WithTitle($"ERROR OCCURED FROM - {source}")
                 .WithDescription($"**Error Deaitls**: \n{error}")
                 .WithColor(DiscordColor.DarkRed)
-                .WithCurrentTimestamp().Build());
-            return embed;
+                .WithCurrentTimestamp().Build();
         }
 
         public static DiscordEmbedBuilder WithCurrentTimestamp(this DiscordEmbedBuilder embedBuilder)

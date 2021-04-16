@@ -35,11 +35,18 @@ namespace Rc.DiscordBot.Modules
 
             if (channel.Type != ChannelType.Voice)
             {
-                await ctx.RespondAsync("Not a valid voice channel.");
+                await new DiscordMessageBuilder()
+                    .WithEmbed(EmbedHandler.CreateErrorEmbed("Music, Join", "You must be connected to a voice channel!"))
+                    .WithReply(ctx.Message.Id, true)
+                    .SendAsync(ctx.Channel);
                 return;
             }
 
             await _audioService.Value.JoinAsync<QueuedLavalinkPlayer>(ctx.Guild.Id, channel.Id, false, false);
+            await new DiscordMessageBuilder()
+                     .WithEmbed(EmbedHandler.CreateBasicEmbed("Music, Join", $"Joined {channel.Name}.", DiscordColor.Green))
+                     .WithReply(ctx.Message.Id, true)
+                     .SendAsync(ctx.Channel);
         }
 
         [Command("join")]
@@ -53,18 +60,52 @@ namespace Rc.DiscordBot.Modules
             }
 
             await _audioService.Value.JoinAsync<QueuedLavalinkPlayer>(ctx.Guild.Id, channel.Id, false, false);
+            await new DiscordMessageBuilder()
+                    .WithEmbed(EmbedHandler.CreateBasicEmbed("Music, Join", $"Joined {channel.Name}.", DiscordColor.Green))
+                    .WithReply(ctx.Message.Id, true)
+                    .SendAsync(ctx.Channel);
         }
 
         [Command("leave")]
-        [Aliases("stop")]
         public async Task LeaveAsync(CommandContext ctx)
         {
             var player = _audioService.Value.GetPlayer(ctx.Guild.Id);
 
-            if (player != null)
+            if (player == null)
             {
-                await player.DisconnectAsync();
+                await new DiscordMessageBuilder()
+                .WithEmbed(EmbedHandler.CreateErrorEmbed("Music, List", $"Could not aquire player.\nAre you using the bot right now?"))
+                .WithReply(ctx.Message.Id, true)
+                .SendAsync(ctx.Channel);
+                return;
             }
+
+            await player.DisconnectAsync();
+            await new DiscordMessageBuilder()
+                 .WithEmbed(EmbedHandler.CreateBasicEmbed("Music", $"I've left. Thank you for playing moosik.", DiscordColor.Blue))
+                 .WithReply(ctx.Message.Id, true)
+                 .SendAsync(ctx.Channel);
+        }
+
+        [Command("stop")]
+        public async Task StopAsync(CommandContext ctx)
+        {
+            var player = _audioService.Value.GetPlayer(ctx.Guild.Id);
+
+            if (player == null)
+            {
+                await new DiscordMessageBuilder()
+                .WithEmbed(EmbedHandler.CreateErrorEmbed("Music, List", $"Could not aquire player.\nAre you using the bot right now?"))
+                .WithReply(ctx.Message.Id, true)
+                .SendAsync(ctx.Channel);
+                return;
+            }
+
+            await player.DisconnectAsync();
+            await new DiscordMessageBuilder()
+                 .WithEmbed(EmbedHandler.CreateBasicEmbed("Music", $"I Have stopped playback & the playlist has been cleared.", DiscordColor.Blue))
+                 .WithReply(ctx.Message.Id, true)
+                 .SendAsync(ctx.Channel);
         }
 
         [Command("play")]
@@ -107,10 +148,18 @@ namespace Rc.DiscordBot.Modules
 
             if (player == null)
             {
+                await new DiscordMessageBuilder()
+                     .WithEmbed(EmbedHandler.CreateErrorEmbed("Music", $"There is nothing to pause."))
+                     .WithReply(ctx.Message.Id, true)
+                     .SendAsync(ctx.Channel);
                 return;
             }
 
-            player.PauseAsync();
+            await player.PauseAsync();
+            await new DiscordMessageBuilder()
+                    .WithEmbed(EmbedHandler.CreateBasicEmbed("Music", $"**Paused:** {player.CurrentTrack!.Title}, what a bamboozle.", DiscordColor.Blue))
+                    .WithReply(ctx.Message.Id, true)
+                    .SendAsync(ctx.Channel);
         }
 
         [Command("resume")]
@@ -120,30 +169,49 @@ namespace Rc.DiscordBot.Modules
 
             if (player == null)
             {
+                await new DiscordMessageBuilder()
+                     .WithEmbed(EmbedHandler.CreateErrorEmbed("Music", $"There is nothing to resume."))
+                     .WithReply(ctx.Message.Id, true)
+                     .SendAsync(ctx.Channel);
                 return;
             }
 
             await player.ResumeAsync();
+            await new DiscordMessageBuilder()
+                .WithEmbed(EmbedHandler.CreateBasicEmbed("Music", $"**Resumed:** {player.CurrentTrack!.Title}, what a bamboozle.", DiscordColor.Blue))
+                .WithReply(ctx.Message.Id, true)
+                .SendAsync(ctx.Channel);
         }
 
-        [Command("skip")]
-        public async Task Volume(CommandContext ctx, float volume)
+        [Command("volume")]
+        public async Task VolumeAsync(CommandContext ctx, float volume)
         {
             var player = _audioService.Value.GetPlayer<QueuedLavalinkPlayer>(ctx.Guild.Id);
 
             if (player == null)
             {
+                await new DiscordMessageBuilder()
+                    .WithEmbed(EmbedHandler.CreateErrorEmbed("Music", "Bot is not connected to a Voice Channel"))
+                    .WithReply(ctx.Message.Id, true)
+                    .SendAsync(ctx.Channel);
                 return;
             }
 
             if (volume < 0 || volume > 1)
             {
+                await new DiscordMessageBuilder()
+                   .WithEmbed(EmbedHandler.CreateErrorEmbed("Music", "Value must between 0.0 and 1.0"))
+                   .WithReply(ctx.Message.Id, true)
+                   .SendAsync(ctx.Channel);
                 return;
             }
 
-
-            player.SetVolumeAsync(volume);
-        }
+            await player.SetVolumeAsync(volume);
+            await new DiscordMessageBuilder()
+              .WithEmbed(EmbedHandler.CreateBasicEmbed("Music", $"Volume has been set to {volume}.", DiscordColor.Blue))
+              .WithReply(ctx.Message.Id, true)
+              .SendAsync(ctx.Channel);
+         }
 
         [Command("ListStreams")]
         public async Task ListStreamsAsync(CommandContext ctx)
@@ -157,6 +225,7 @@ namespace Rc.DiscordBot.Modules
 
             foreach (StreamConfig? stream in _audioConfig.Streams)
             {
+
                 string? key = stream.Name;
                 if (string.IsNullOrEmpty(stream.DisplayName) == false)
                 {
@@ -166,7 +235,10 @@ namespace Rc.DiscordBot.Modules
                 builder.AddField(key, stream.Url, false);
             }
 
-            await ctx.RespondAsync(builder.Build());
+            await new DiscordMessageBuilder()
+              .WithEmbed(builder.Build())
+              .WithReply(ctx.Message.Id, true)
+              .SendAsync(ctx.Channel);
         }
 
         [Command("Stream")]
@@ -176,13 +248,21 @@ namespace Rc.DiscordBot.Modules
 
             if (player == null)
             {
-                await ctx.RespondAsync(await EmbedHandler.CreateErrorEmbed("Music, Play", "You Must First Join a Voice Channel."));
+                await new DiscordMessageBuilder()
+                   .WithEmbed(EmbedHandler.CreateErrorEmbed("Music", "You Must First Join a Voice Channel."))
+                   .WithReply(ctx.Message.Id, true)
+                   .SendAsync(ctx.Channel);
+
                 return;
             }
 
             if (stream.StartsWith("http"))
             {
-                await ctx.RespondAsync(await EmbedHandler.CreateErrorEmbed("Music, Play", "Please specify the stream name"));
+                await new DiscordMessageBuilder()
+                  .WithEmbed(EmbedHandler.CreateErrorEmbed("Music", "Please specify the stream name"))
+                  .WithReply(ctx.Message.Id, true)
+                  .SendAsync(ctx.Channel);
+
                 return;
             }
 
@@ -198,7 +278,10 @@ namespace Rc.DiscordBot.Modules
 
             if (audioStream == null)
             {
-                await ctx.RespondAsync(await EmbedHandler.CreateErrorEmbed("Music, Play", $"No Stream with the name {stream} found"));
+                await new DiscordMessageBuilder()
+                .WithEmbed(EmbedHandler.CreateErrorEmbed("Music", $"No Stream with the name {stream} found"))
+                .WithReply(ctx.Message.Id, true)
+                .SendAsync(ctx.Channel);
                 return;
             }
 
@@ -207,7 +290,11 @@ namespace Rc.DiscordBot.Modules
             //If we couldn't find anything, tell the user.
             if (track == null)
             {
-                await ctx.RespondAsync(await EmbedHandler.CreateErrorEmbed("Music", $"I wasn't able to find anything for {audioStream.Url}."));
+                await new DiscordMessageBuilder()
+               .WithEmbed(EmbedHandler.CreateErrorEmbed("Music", $"I wasn't able to find anything for {audioStream.Url}."))
+               .WithReply(ctx.Message.Id, true)
+               .SendAsync(ctx.Channel);
+
                 return;
             }
 
@@ -215,19 +302,24 @@ namespace Rc.DiscordBot.Modules
 
             if (queueCount > 0)
             {
-                await ctx.RespondAsync(await EmbedHandler.CreateBasicEmbed("Music", $"{track!.Title} has been added to queue.", DiscordColor.Blue));
+                await new DiscordMessageBuilder()
+                  .WithEmbed(EmbedHandler.CreateBasicEmbed("Music", $"{track!.Title} has been added to queue.", DiscordColor.Blue))
+                  .WithReply(ctx.Message.Id, true)
+                  .SendAsync(ctx.Channel);
             }
             else
             {
                 List<DiscordField> fields = new()
                 {
-                    new DiscordField("Channel", ctx.Guild.GetChannel(player.VoiceChannelId.Value).Name)
+                    new DiscordField("Channel", ctx.Guild.GetChannel(player.VoiceChannelId!.Value).Name)
                 };
 
-                DiscordAuthor author = new DiscordAuthor(ctx.User.Username, IconUrl: ctx.User.AvatarUrl);
+                DiscordAuthor author = new(ctx.User.Username, IconUrl: ctx.User.AvatarUrl);
 
-                await ctx.RespondAsync(await EmbedHandler.CreateBasicEmbed("Music", $"Now Playing: {track!.Title}\nUrl: {track.Source}", DiscordColor.Blue, fields, author));
-
+                await new DiscordMessageBuilder()
+                 .WithEmbed(EmbedHandler.CreateBasicEmbed("Music", $"Now Playing: {track!.Title}\nUrl: {track.Source}", DiscordColor.Blue, fields, author))
+                 .WithReply(ctx.Message.Id, true)
+                 .SendAsync(ctx.Channel);
             }
         }
     }
@@ -236,14 +328,6 @@ namespace Rc.DiscordBot.Modules
     /*[Name("Audio")]
     public class AudioModule : ModuleBase<SocketCommandContext>
     {
-        private readonly LavaLinkAudio _audioService;
-
-        public AudioModule(LavaLinkAudio lavaLinkAudio)
-        {
-            _audioService = lavaLinkAudio;
-        }
-
-
         [Command("List")]
         public async Task List()
         {
@@ -256,8 +340,6 @@ namespace Rc.DiscordBot.Modules
             await ReplyAsync(embed: await _audioService.SkipTrackAsync(Context.Guild));
         }
 
-
-    
 
         [Command("ClearPlaylist")]
         public async Task ClearPlaylist()

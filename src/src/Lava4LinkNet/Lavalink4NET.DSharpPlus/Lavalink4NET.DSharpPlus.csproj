@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="4.0.0-rc3" />
+    <PackageReference Include="DSharpPlus" Version="4.0.0" />
     <PackageReference Include="Lavalink4NET" Version="1.6.3" />
   </ItemGroup>
 </Project>
