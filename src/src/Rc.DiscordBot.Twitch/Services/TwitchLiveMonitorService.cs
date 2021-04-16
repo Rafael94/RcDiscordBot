@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿
+using DSharpPlus.Entities;
 using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
@@ -67,7 +68,7 @@ namespace Rc.DiscordBot.Services
 
         private void Monitor_OnStreamOnline(object? sender, OnStreamOnlineArgs e)
         {
-            Embed? embed = CreateEmbed(_twitchConfig.ChannelOnline, e.Channel, e.Stream);
+            DiscordEmbed? embed = CreateEmbed(_twitchConfig.ChannelOnline, e.Channel, e.Stream);
 
             SendMessageAsync(embed, e.Channel, ChannelStatus.Online).GetAwaiter().GetResult();
 
@@ -88,18 +89,18 @@ namespace Rc.DiscordBot.Services
             stream.Title = e.Stream.Title;
             stream.Game = e.Stream.GameName;
 
-            Embed? embed = CreateEmbed(_twitchConfig.ChannelUpdated, e.Channel, e.Stream);
+            DiscordEmbed? embed = CreateEmbed(_twitchConfig.ChannelUpdated, e.Channel, e.Stream);
             SendMessageAsync(embed, e.Channel, ChannelStatus.Updated).GetAwaiter().GetResult();
         }
 
         private void Monitor_OnStreamOffline(object? sender, OnStreamOfflineArgs e)
         {
-            Embed? embed = CreateEmbed(_twitchConfig.ChannelOffline, e.Channel, e.Stream);
+            DiscordEmbed? embed = CreateEmbed(_twitchConfig.ChannelOffline, e.Channel, e.Stream);
             SendMessageAsync(embed, e.Channel, ChannelStatus.Offline).GetAwaiter().GetResult();
             _onlineStreams.Remove(e.Channel);
         }
 
-        private Embed CreateEmbed(string titleTemplate, string channel, Stream stream)
+        private DiscordEmbed CreateEmbed(string titleTemplate, string channel, Stream stream)
         {
             StringFormatter? formatter = new(titleTemplate);
             formatter.Add("@ChannelName", channel);
@@ -110,21 +111,21 @@ namespace Rc.DiscordBot.Services
 
             string? notificationText = formatter.ToString();
 
-            return new EmbedBuilder()
+            return new DiscordEmbedBuilder()
                                .WithTitle(notificationText)
-                               .WithUrl("https://twitch.tv/" + channel)
-                               .WithThumbnailUrl(stream.ThumbnailUrl.Replace("{width}", _twitchConfig.ThumbnailWidth.ToString()).Replace("{height}", _twitchConfig.ThumbnailHeight.ToString()))
+                               .WithUrl("https://twitch.tv/" + channel)                         
+                               .WithThumbnail(stream.ThumbnailUrl.Replace("{width}", _twitchConfig.ThumbnailWidth.ToString()).Replace("{height}", _twitchConfig.ThumbnailHeight.ToString()))
                                .AddField("Titel", stream.Title)
                                .AddField("Game", stream.GameName)
-                               .AddField("Zuschauer", stream.ViewerCount)
+                               .AddField("Zuschauer", stream.ViewerCount.ToString())
                                .AddField("Typ", stream.Type)
                                .WithAuthor(stream.UserName)
-                               .WithColor(Color.Blue)
+                               .WithColor(DiscordColor.Blue)
                                .WithBotFooter()
                                .Build();
         }
 
-        private async Task SendMessageAsync(Embed embed, string channelName, ChannelStatus status)
+        private async Task SendMessageAsync(DiscordEmbed embed, string channelName, ChannelStatus status)
         {
             if (_twitchConfig.TwitchChannels!.TryGetValue(channelName, out TwitchChannel? twitchChannel) == false)
             {

@@ -3,11 +3,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
 using SteamWebAPI2.Interfaces;
 using SteamWebAPI2.Mappings;
 using SteamWebAPI2.Utilities;
 using System;
+using System.Reflection;
 
 namespace Rc.DiscordBot.Steam
 {
@@ -22,6 +24,7 @@ namespace Rc.DiscordBot.Steam
                 return;
             }
 
+            services.PostConfigure<CommandHandler>((commandHandler) => commandHandler.Assemblies.Add(Assembly.GetExecutingAssembly()));
 
             services.Configure<SteamConfig>(options => hostContext.Configuration.GetSection("Steam").Bind(options));
 

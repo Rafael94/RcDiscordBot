@@ -1,5 +1,6 @@
-﻿using Discord;
-using Discord.WebSocket;
+﻿using DSharpPlus;
+using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Handlers;
@@ -17,11 +18,11 @@ namespace Rc.DiscordBot.Services
 
         private readonly BotConfig _botConfig;
         private readonly ILogger<DiscordService> _logger;
-        public DiscordSocketClient Client { get; init; }
+        public DiscordClient Client { get; init; }
 
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Nicht verwendete Parameter entfernen", Justification = "<Ausstehend>")]
-        public DiscordService(IOptions<BotConfig> botConfigOptions, DiscordSocketClient client, CommandHandler commandHandler /* Wird benötigt, damit der Commandhandler initialisiert wird*/, ILogger<DiscordService> logger)
+        public DiscordService(IOptions<BotConfig> botConfigOptions, DiscordClient client, ILogger<DiscordService> logger)
         {
             _botConfig = botConfigOptions.Value;
             Client = client;
@@ -31,77 +32,57 @@ namespace Rc.DiscordBot.Services
 
         }
 
-        public async Task StartAsync()
+        public Task StartAsync()
         {
             _logger.LogInformation("Start Discord Bot");
-            await Client.LoginAsync(TokenType.Bot, _botConfig.BotToken);
-            await Client.StartAsync();
+            return Client.ConnectAsync();
         }
 
-        public async Task StopAsync()
+        public Task StopAsync()
         {
             _logger.LogInformation("Stop Discord Bot");
-            await Client.StopAsync();
-            await Client.LogoutAsync();
+            return Client.DisconnectAsync();
         }
 
         private void SubscribeDiscordEvents()
         {
             Client.Ready += ReadyAsync;
-            Client.Log += LogAsync;
+
+            Client.ClientErrored += (DiscordClient client, ClientErrorEventArgs args) =>
+            {
+                _logger.LogError("Cleint Error", args.Exception);
+                return Task.CompletedTask;
+            };
+
+            Client.SocketErrored += (DiscordClient client, SocketErrorEventArgs args) =>
+            {
+                _logger.LogError("Socket Error", args.Exception);
+                return Task.CompletedTask;
+            };
         }
 
-        private async Task ReadyAsync()
+        private async Task ReadyAsync(DiscordClient client, ReadyEventArgs args)
         {
 
             _logger.LogInformation("Discord Bot Ready");
-            await Client.SetGameAsync(_botConfig.GameStatus);
+            await client.UpdateStatusAsync(new DSharpPlus.Entities.DiscordActivity(_botConfig.GameStatus), DSharpPlus.Entities.UserStatus.Online);
         }
 
-        /*Used whenever we want to log something to the Console. 
-            Todo: Hook in a Custom LoggingService. */
-        private Task LogAsync(LogMessage logMessage)
+        public async Task SendMessageAsync(IEnumerable<MessageSendToDiscordServer> discordServers, string? text = null, DiscordEmbed? embed = null)
         {
-            switch (logMessage.Severity)
-            {
-                case LogSeverity.Critical:
-                    _logger.LogCritical(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
-                    break;
-                case LogSeverity.Error:
-                    _logger.LogError(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
-                    break;
-                case LogSeverity.Warning:
-                    _logger.LogWarning(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
-                    break;
-                case LogSeverity.Info:
-                    _logger.LogInformation(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
-                    break;
-                case LogSeverity.Verbose:
-                    _logger.LogTrace(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
-                    break;
-                case LogSeverity.Debug:
-                    _logger.LogDebug(logMessage.Exception, $"Source: {logMessage.Source} Message: {logMessage.Message}");
-                    break;
-            }
-
-            return Task.CompletedTask;
-        }
-
-        public async Task SendMessageAsync(IEnumerable<MessageSendToDiscordServer> discordServers, string? text = null, Embed? embed = null)
-        {
-            IReadOnlyCollection<SocketGuild>? servers = Client.Guilds;
+            var servers = Client.Guilds;
 
             // Server durchlaufen die Benachrichtigt werden sollen
             foreach (MessageSendToDiscordServer? discordServer in discordServers)
             {
-                SocketGuild? socketGuild = null;
+                DiscordGuild? socketGuild = null;
 
                 // Discord Server ID ermitteln
-                foreach (SocketGuild? server in servers)
+                foreach (var server in servers)
                 {
-                    if (string.Equals(server.Name, discordServer.Name, StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(server.Value.Name, discordServer.Name, StringComparison.OrdinalIgnoreCase))
                     {
-                        socketGuild = server;
+                        socketGuild = server.Value;
                         break;
                     }
                 }
@@ -112,23 +93,15 @@ namespace Rc.DiscordBot.Services
                     continue;
                 }
 
-                foreach (SocketGuildChannel? channel in socketGuild.Channels)
+                foreach (var channel in socketGuild.Channels)
                 {
-                    // Nur Text Channels beachten
-                    if ((channel is SocketTextChannel txtChannel))
+                    if(channel.Value.Type == ChannelType.Text && string.Equals(channel.Value.Name, discordServer.Channel, StringComparison.OrdinalIgnoreCase))
                     {
-                        // Prüfen ob es im Channel gepostet werden soll
-                        if (string.Equals(channel.Name, discordServer.Channel, StringComparison.OrdinalIgnoreCase))
-                        {
-                            await txtChannel.SendMessageAsync(text: text, embed: embed);
-                            break;
-                        }
+                        await channel.Value.SendMessageAsync(content: text, embed: embed);
                     }
                 }
-
             }
         }
-
 
         public void Dispose()
         {

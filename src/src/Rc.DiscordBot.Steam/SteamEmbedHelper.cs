@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿
+using DSharpPlus.Entities;
 using Rc.DiscordBot.Extensions;
 using Rc.DiscordBot.Handlers;
 using Steam.Models;
@@ -8,16 +9,16 @@ namespace Rc.DiscordBot
 {
     public static class SteamEmbedHelper
     {
-        public static Embed CreateEmbed(StoreAppDetailsDataModel app, NewsItemModel item, System.DateTimeOffset date)
+        public static DiscordEmbed CreateEmbed(StoreAppDetailsDataModel app, NewsItemModel item, System.DateTimeOffset date)
         {
-            return new EmbedBuilder()
+            return new DiscordEmbedBuilder()
                                .WithTitle($"Game News - {app.Name}: {item.Title}")
                                .WithImageUrl(app.HeaderImage)
                                .WithTimestamp(date)
                                .WithCustomDescription(item.Contents)
                                .WithUrl(item.Url)
                                .WithAuthor(item.Author)
-                               .WithColor(Color.Blue)
+                               .WithColor(DiscordColor.Blue)
                                .WithBotFooter()
                                .AddField("Feed Name", item.Feedname, true)
                                .AddField("Feed Label", item.FeedLabel, true)

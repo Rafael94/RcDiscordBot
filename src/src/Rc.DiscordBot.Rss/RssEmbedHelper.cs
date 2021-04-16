@@ -1,19 +1,19 @@
 ﻿using CodeHollow.FeedReader;
-using Discord;
+using DSharpPlus.Entities;
 using Rc.DiscordBot.Handlers;
 
 namespace Rc.DiscordBot
 {
     public static class RssEmbedHelper
     {
-        public static Embed CreateEmbed(string feedName, FeedItem item)
+        public static DiscordEmbed CreateEmbed(string feedName, FeedItem item)
         {
-            return new EmbedBuilder()
+            return new DiscordEmbedBuilder()
                                .WithTitle($"RSS - {feedName}: {item.Title}")
                                .WithCustomDescription(item.Description)
                                .WithUrl(item.Link)
                                .WithAuthor(item.Author)
-                               .WithColor(Color.Blue)
+                               .WithColor(DiscordColor.Blue)
                                .WithBotFooter()
                                .Build();
         }

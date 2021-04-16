@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿
+using DSharpPlus.Entities;
+using Rc.DiscordBot.Models;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -11,24 +13,25 @@ namespace Rc.DiscordBot.Handlers
         /* This file is where we can store all the Embed Helper Tasks (So to speak). 
              We wrap all the creations of new EmbedBuilder's in a Task.Run to allow us to stick with Async calls. 
              All the Tasks here are also static which means we can call them from anywhere in our program. */
-        public static Task<Embed> CreateBasicEmbed(string title,
+        public static DiscordEmbed CreateBasicEmbed(string title,
             string description,
-            Color color,
-            IEnumerable<EmbedFieldBuilder>? fileds = null,
-            EmbedAuthorBuilder? author = null,
+            DiscordColor color,
+            IEnumerable<DiscordField>? fields = null,
+            DiscordAuthor? author = null,
             string? url = null,
             string? imageUrl = null)
         {
-            EmbedBuilder? builder = new EmbedBuilder()
+           
+            var builder = new DiscordEmbedBuilder()
                 .WithTitle(title)
                 .WithCustomDescription(description)
                 .WithColor(color)
                 .WithCurrentTimestamp()
                 .WithBotFooter();
 
-            if (fileds != null)
+            if (fields != null)
             {
-                builder = builder.WithFields(fileds);
+                builder = builder.AddFields(fields);
             }
 
             if (author != null)
@@ -46,12 +49,32 @@ namespace Rc.DiscordBot.Handlers
                 builder.WithUrl(url);
             }
 
-            return Task.FromResult(builder.Build());
+            return builder.Build();
         }
 
-        public static EmbedBuilder WithBotFooter(this EmbedBuilder embedBuilder)
+        public static DiscordEmbedBuilder WithBotFooter(this DiscordEmbedBuilder embedBuilder)
         {
             return embedBuilder.WithFooter("Bot von Rafael Carnucci. https://github.com/Rafael94/DiscordBot");
+        }
+
+        public static DiscordEmbedBuilder WithAuthor(this DiscordEmbedBuilder embedBuilder, DiscordAuthor discordAuthor)
+        {
+            return embedBuilder.WithAuthor(discordAuthor.Name, discordAuthor.Url, discordAuthor.IconUrl);
+        }
+
+        public static DiscordEmbedBuilder AddField(this DiscordEmbedBuilder embedBuilder, DiscordField field)
+        {
+            return embedBuilder.AddField(field.Name, field.Value, field.Inline);
+        }
+
+        public static DiscordEmbedBuilder AddFields(this DiscordEmbedBuilder embedBuilder, IEnumerable< DiscordField> fields)
+        {
+            foreach(var field in fields)
+            {
+                embedBuilder.AddField(field.Name, field.Value, field.Inline);
+            }
+
+            return embedBuilder;
         }
 
         /// <summary>
@@ -61,7 +84,7 @@ namespace Rc.DiscordBot.Handlers
         /// <param name="embedBuilder"></param>
         /// <param name="description"></param>
         /// <returns></returns>
-        public static EmbedBuilder WithCustomDescription(this EmbedBuilder embedBuilder, string description)
+        public static DiscordEmbedBuilder WithCustomDescription(this DiscordEmbedBuilder embedBuilder, string description)
         {
             if (description == null)
             {
@@ -83,14 +106,18 @@ namespace Rc.DiscordBot.Handlers
             return embedBuilder.WithDescription(description);
         }
 
-        public static async Task<Embed> CreateErrorEmbed(string source, string error)
+        public static  DiscordEmbed CreateErrorEmbed(string source, string error)
         {
-            Embed? embed = await Task.Run(() => new EmbedBuilder()
+            return new DiscordEmbedBuilder()
                 .WithTitle($"ERROR OCCURED FROM - {source}")
                 .WithDescription($"**Error Deaitls**: \n{error}")
-                .WithColor(Color.DarkRed)
-                .WithCurrentTimestamp().Build());
-            return embed;
+                .WithColor(DiscordColor.DarkRed)
+                .WithCurrentTimestamp().Build();
+        }
+
+        public static DiscordEmbedBuilder WithCurrentTimestamp(this DiscordEmbedBuilder embedBuilder)
+        {
+            return embedBuilder.WithTimestamp(DateTimeOffset.Now);
         }
     }
 }
