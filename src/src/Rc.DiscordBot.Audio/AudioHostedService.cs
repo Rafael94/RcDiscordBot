@@ -45,8 +45,39 @@ namespace Rc.DiscordBot
 
                           _logger.LogError("Error by AudioService InitializeAsync", ex);
                       }
-                    
+
                   });
+            };
+
+            _discordClient.VoiceStateUpdated += (DiscordClient client, VoiceStateUpdateEventArgs args) =>
+            {
+                return Task.Factory.StartNew(async () =>
+                {
+                    var player = _audioService.GetPlayer<QueuedLavalinkPlayer>(args.Guild.Id);
+
+                    if (player == null)
+                    {
+                        return;
+                    }
+
+                    var memberCount = args.Channel.Users.Count();
+                    // 1 => Nur der Bot befindet sich im Channel
+                    if (memberCount == 1)
+                    {
+                        if (player.State == PlayerState.Playing)
+                        {
+                            await player.PauseAsync();
+                        }
+                    }
+                    else if (memberCount == 2 && player.State == PlayerState.Paused)
+                    {
+                        if (player.CurrentTrack != null || player.Queue.Count > 0)
+                        {
+                            await player.ResumeAsync();
+                        }
+                    }
+
+                });
             };
 
             return Task.CompletedTask;
@@ -63,7 +94,7 @@ namespace Rc.DiscordBot
                         await player.DisconnectAsync();
                         player.Dispose();
                     }
-                    catch (Exception){}                 
+                    catch (Exception) { }
                 }
             }
 

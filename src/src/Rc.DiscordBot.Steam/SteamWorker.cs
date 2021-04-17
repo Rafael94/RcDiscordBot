@@ -40,7 +40,7 @@ namespace Rc.DiscordBot
             {
                 stoppingToken.ThrowIfCancellationRequested();
                 _logger.LogInformation($"Init Steam News Timer with Intervall {_steamConfig.Interval}");
-                using Timer? timer = new(HandleTimerCallback, null, TimeSpan.Zero, _steamConfig.Interval);
+                using Timer? timer = new(HandleTimerCallback, null, _steamConfig.Interval, _steamConfig.Interval);
 
                 while (!stoppingToken.IsCancellationRequested)
                 {

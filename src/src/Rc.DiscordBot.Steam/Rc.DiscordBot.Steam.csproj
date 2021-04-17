@@ -8,7 +8,7 @@
     <RootNamespace>Rc.DiscordBot</RootNamespace>
     <Configurations>Debug;Release;Windows;Linux</Configurations>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="SteamWebAPI2" Version="4.3.0" />
   </ItemGroup>
