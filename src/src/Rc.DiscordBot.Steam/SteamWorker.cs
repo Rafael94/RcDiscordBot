@@ -31,7 +31,7 @@ namespace Rc.DiscordBot
         private readonly DiscordService _discordService;
         private readonly SteamStore _steamStore;
 
-        private DateTime _lastCheck = DateTime.Now;
+        private DateTimeOffset _lastCheck = DateTimeOffset.Now;
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -85,7 +85,7 @@ namespace Rc.DiscordBot
                     await SendMessageAsync(_steamConfig.News[i], gameDetails, news, date);
                 }
             }
-            _lastCheck = DateTime.Now;
+            _lastCheck = DateTimeOffset.Now;
         }
 
         private async Task SendMessageAsync(News newsConfig, StoreAppDetailsDataModel app, NewsItemModel item, DateTimeOffset date)

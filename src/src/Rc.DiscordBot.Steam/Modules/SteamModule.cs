@@ -2,6 +2,7 @@
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
@@ -47,7 +48,7 @@ namespace Rc.DiscordBot.Modules
                 }
 
                 await new DiscordMessageBuilder()
-                  .WithEmbed(EmbedHandler.CreateBasicEmbed("News", $"Hinterlegte RSS Feeds", DiscordColor.Blue))
+                  .WithEmbed(EmbedHandler.CreateBasicEmbed("News", $"Hinterlegte RSS Feeds", DiscordColor.Blue, fields: fileds))
                   .WithReply(ctx.Message.Id, true)
                   .SendAsync(ctx.Channel);
             }

@@ -16,7 +16,7 @@ namespace Rc.DiscordBot
                                .WithImageUrl(app.HeaderImage)
                                .WithTimestamp(date)
                                .WithCustomDescription(item.Contents)
-                               .WithUrl(item.Url)
+                               //.WithUrl(item.Url)
                                .WithAuthor(item.Author)
                                .WithColor(DiscordColor.Blue)
                                .WithBotFooter()

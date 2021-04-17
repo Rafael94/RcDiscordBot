@@ -214,6 +214,12 @@ namespace Rc.DiscordBot.Modules
             }
 
             await mgsBUilder.SendAsync(ctx.Channel);
+
+            // Wenn sich keiner außer der Bot im Channel befindet, den Player pausieren
+            if (ctx.Guild.GetChannel(player.VoiceChannelId.Value).Users.Count() == 1)
+            {
+                await player.PauseAsync();
+            }
         }
 
         [Command("pause")]
