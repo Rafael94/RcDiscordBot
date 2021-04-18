@@ -7,9 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
-using Rc.DiscordBot.Modules;
-using Rc.DiscordBot.Services;
-using System;
 using System.Reflection;
 
 namespace Rc.DiscordBot
@@ -25,14 +22,14 @@ namespace Rc.DiscordBot
                 .AddSingleton<IHostedService, AudioHostedService>()
                 .AddSingleton<IAudioService, LavalinkNode>()
                 .AddSingleton<IDiscordClientWrapper, DiscordClientWrapper>()
-	            .AddSingleton((services) =>
+                .AddSingleton((services) =>
                 {
                     var config = services.GetRequiredService<IOptions<LavaConfig>>().Value;
 
                     return new LavalinkNodeOptions
                     {
                         Password = config.Password,
-                        RestUri = $"http{(config.Secured? "s": "")}://{config.Host}:{config.Port}",
+                        RestUri = $"http{(config.Secured ? "s" : "")}://{config.Host}:{config.Port}",
                         WebSocketUri = $"ws://{config.Host}:{config.Port}",
                         AllowResuming = false,
                         SessionTimeout = 10

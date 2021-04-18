@@ -113,7 +113,7 @@ namespace Rc.DiscordBot.Services
 
             return new DiscordEmbedBuilder()
                                .WithTitle(notificationText)
-                               .WithUrl("https://twitch.tv/" + channel)                         
+                               .WithUrl("https://twitch.tv/" + channel)
                                .WithThumbnail(stream.ThumbnailUrl.Replace("{width}", _twitchConfig.ThumbnailWidth.ToString()).Replace("{height}", _twitchConfig.ThumbnailHeight.ToString()))
                                .AddField("Titel", stream.Title)
                                .AddField("Game", stream.GameName)

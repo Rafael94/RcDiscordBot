@@ -29,20 +29,20 @@ namespace Rc.DiscordBot
                 {
                     Token = config.BotToken,
                     TokenType = TokenType.Bot,
-                    Intents = DiscordIntents.AllUnprivileged,                 
+                    Intents = DiscordIntents.AllUnprivileged,
                 });
-               
+
                 var commands = client.UseCommandsNext(new CommandsNextConfiguration()
                 {
                     StringPrefixes = new[] { config.Prefix },
                     Services = serviceProvider
                 });
 
-                foreach(var assembly in handler.Assemblies)
+                foreach (var assembly in handler.Assemblies)
                 {
                     commands.RegisterCommands(assembly);
                 }
-                
+
                 return client;
             });
 

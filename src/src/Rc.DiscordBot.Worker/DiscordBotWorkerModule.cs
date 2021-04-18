@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Steam;
 using Serilog;
 using System;
 using System.IO;
-using System.Reflection;
 
 namespace Rc.DiscordBot
 {
@@ -38,16 +36,16 @@ namespace Rc.DiscordBot
 
             //services.AddSingleton((IServiceProvider provider) =>
             //{
-                //CommandHandler? commandHandler = (CommandHandler)ActivatorUtilities.CreateInstance(provider, typeof(CommandHandler));
+            //CommandHandler? commandHandler = (CommandHandler)ActivatorUtilities.CreateInstance(provider, typeof(CommandHandler));
 
-                //commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotCoreModule))!).GetAwaiter().GetResult();
-                //commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotAudioModule))!).GetAwaiter().GetResult();
-               // commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotTwitchModule))!).GetAwaiter().GetResult();
-               //commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotRssModule))!).GetAwaiter().GetResult();
-                //commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotSteamModule))!).GetAwaiter().GetResult();
+            //commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotCoreModule))!).GetAwaiter().GetResult();
+            //commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotAudioModule))!).GetAwaiter().GetResult();
+            // commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotTwitchModule))!).GetAwaiter().GetResult();
+            //commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotRssModule))!).GetAwaiter().GetResult();
+            //commandHandler.AddModulesAsync(Assembly.GetAssembly(typeof(DiscordBotSteamModule))!).GetAwaiter().GetResult();
 
-                //return commandHandler;
-           // });
+            //return commandHandler;
+            // });
 
         }
     }

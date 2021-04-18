@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Rc.DiscordBot.Models
+﻿namespace Rc.DiscordBot.Models
 {
     public record LavaConfig
     {

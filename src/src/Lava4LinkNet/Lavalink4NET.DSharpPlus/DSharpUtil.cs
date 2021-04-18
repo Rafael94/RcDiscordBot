@@ -27,11 +27,11 @@
 
 namespace Lavalink4NET.DSharpPlus
 {
-    using System.Reflection;
     using global::DSharpPlus;
     using global::DSharpPlus.Entities;
     using global::DSharpPlus.EventArgs;
     using global::DSharpPlus.Net.WebSocket;
+    using System.Reflection;
 
     /// <summary>
     ///     An utility for getting internal / private fields from DSharpPlus WebSocket Gateway Payloads.

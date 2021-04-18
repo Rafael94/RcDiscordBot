@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Rc.DiscordBot.Modules
 {
-    
+
     [Group("rss")]
     public class RssFeedModule : BaseCommandModule
     {
@@ -32,7 +32,7 @@ namespace Rc.DiscordBot.Modules
             {
                 Models.Feed? feedConfig = _rssConfig.Feeds[i];
 
-                MessageSendToDiscordServer? discordServer = feedConfig.DiscordServers.Where(x => string.Equals(x.Name ,ctx.Guild.Name, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                MessageSendToDiscordServer? discordServer = feedConfig.DiscordServers.Where(x => string.Equals(x.Name, ctx.Guild.Name, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                 fileds.Add(
                     new DiscordField($"{feedConfig.Name}  { (discordServer == null ? "" : " - " + discordServer.Channel + "")}", feedConfig.Url, false));

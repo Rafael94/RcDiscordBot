@@ -25,7 +25,7 @@ namespace Rc.DiscordBot
             }
 
             services.PostConfigure<CommandHandler>((commandHandler) => commandHandler.Assemblies.Add(Assembly.GetExecutingAssembly()));
-            
+
             services.Configure<TwitchConfig>(options => hostContext.Configuration.GetSection("Twitch").Bind(options));
 
             services.AddSingleton<TwitchLiveMonitorService>();

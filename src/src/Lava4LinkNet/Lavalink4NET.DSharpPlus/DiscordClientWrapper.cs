@@ -27,15 +27,15 @@
 
 namespace Lavalink4NET.DSharpPlus
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
     using global::DSharpPlus;
     using global::DSharpPlus.EventArgs;
     using Lavalink4NET.Events;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
 
     /// <summary>
     ///     A wrapper for the discord client from the "DSharpPlus" discord client library. (https://github.com/DSharpPlus/DSharpPlus)
@@ -171,7 +171,7 @@ namespace Lavalink4NET.DSharpPlus
         private Task OnVoiceServerUpdated(DiscordClient _, VoiceServerUpdateEventArgs voiceServer)
         {
             EnsureNotDisposed();
-            if(voiceServer.Endpoint == null)
+            if (voiceServer.Endpoint == null)
             {
                 return Task.CompletedTask;
             }

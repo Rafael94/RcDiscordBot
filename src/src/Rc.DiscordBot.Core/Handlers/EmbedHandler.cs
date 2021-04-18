@@ -4,7 +4,6 @@ using Rc.DiscordBot.Models;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Rc.DiscordBot.Handlers
 {
@@ -21,7 +20,7 @@ namespace Rc.DiscordBot.Handlers
             string? url = null,
             string? imageUrl = null)
         {
-           
+
             var builder = new DiscordEmbedBuilder()
                 .WithTitle(title)
                 .WithCustomDescription(description)
@@ -39,7 +38,7 @@ namespace Rc.DiscordBot.Handlers
                 builder.WithAuthor(author);
             }
 
-            if(string.IsNullOrWhiteSpace(imageUrl) == false)
+            if (string.IsNullOrWhiteSpace(imageUrl) == false)
             {
                 builder.WithImageUrl(imageUrl);
             }
@@ -67,9 +66,9 @@ namespace Rc.DiscordBot.Handlers
             return embedBuilder.AddField(field.Name, field.Value, field.Inline);
         }
 
-        public static DiscordEmbedBuilder AddFields(this DiscordEmbedBuilder embedBuilder, IEnumerable< DiscordField> fields)
+        public static DiscordEmbedBuilder AddFields(this DiscordEmbedBuilder embedBuilder, IEnumerable<DiscordField> fields)
         {
-            foreach(var field in fields)
+            foreach (var field in fields)
             {
                 embedBuilder.AddField(field.Name, field.Value, field.Inline);
             }
@@ -106,7 +105,7 @@ namespace Rc.DiscordBot.Handlers
             return embedBuilder.WithDescription(description);
         }
 
-        public static  DiscordEmbed CreateErrorEmbed(string source, string error)
+        public static DiscordEmbed CreateErrorEmbed(string source, string error)
         {
             return new DiscordEmbedBuilder()
                 .WithTitle($"ERROR OCCURED FROM - {source}")

@@ -2,7 +2,6 @@
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
@@ -10,10 +9,8 @@ using SteamWebAPI2.Interfaces;
 using SteamWebAPI2.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace Rc.DiscordBot.Modules
@@ -44,7 +41,7 @@ namespace Rc.DiscordBot.Modules
 
                     MessageSendToDiscordServer? discordServer = newsConfig.DiscordServers.Where(x => string.Equals(x.Name, ctx.Guild.Name, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
-                    fileds.Add(new DiscordField($"{newsConfig.Name}  { (discordServer == null ? "" : " - " + discordServer.Channel + "")}", newsConfig.AppId.ToString(), false) );
+                    fileds.Add(new DiscordField($"{newsConfig.Name}  { (discordServer == null ? "" : " - " + discordServer.Channel + "")}", newsConfig.AppId.ToString(), false));
                 }
 
                 await new DiscordMessageBuilder()
@@ -85,7 +82,7 @@ namespace Rc.DiscordBot.Modules
                 var steamInterface = _steamWebInterfaceFactory.CreateSteamWebInterface<SteamUserStats>(new HttpClient());
 
                 var curentPlayerCount = await steamInterface.GetNumberOfCurrentPlayersForGameAsync(gameId);
-      
+
 
                 DiscordEmbed embed = new DiscordEmbedBuilder()
                 .WithTitle("Informationen zum Spiel " + gameDetails.Name)
@@ -120,9 +117,9 @@ namespace Rc.DiscordBot.Modules
                 var games = await steamInterface.GetAppListAsync();
                 List<DiscordField> fileds = new();
 
-                foreach(var game in games.Data)
+                foreach (var game in games.Data)
                 {
-                    if(game.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase))
+                    if (game.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase))
                     {
                         fileds.Add(new(game.Name, game.AppId.ToString()));
 
@@ -145,7 +142,7 @@ namespace Rc.DiscordBot.Modules
         {
             private readonly SteamWebInterfaceFactory _steamWebInterfaceFactory;
 
-            public Player( SteamWebInterfaceFactory steamWebInterfaceFactory)
+            public Player(SteamWebInterfaceFactory steamWebInterfaceFactory)
             {
                 _steamWebInterfaceFactory = steamWebInterfaceFactory;
             }
@@ -167,12 +164,12 @@ namespace Rc.DiscordBot.Modules
                 }
 
                 List<DiscordField>? fields = new()
-                {                        
+                {
                     new DiscordField("Benutzer Status", playerSummary.Data.UserStatus.ToString()),
-                    new DiscordField("Bei Steam seit",playerSummary.Data.AccountCreatedDate.ToString())
+                    new DiscordField("Bei Steam seit", playerSummary.Data.AccountCreatedDate.ToString())
                 };
 
-                if(string.IsNullOrWhiteSpace(playerSummary.Data.PlayingGameName) == false)
+                if (string.IsNullOrWhiteSpace(playerSummary.Data.PlayingGameName) == false)
                 {
                     fields.Add(new DiscordField("Aktuelles Spiel", playerSummary.Data.PlayingGameName));
                 }
@@ -181,7 +178,7 @@ namespace Rc.DiscordBot.Modules
                   .WithEmbed(EmbedHandler.CreateBasicEmbed("Spieler " + playerSummary.Data.Nickname, $"Informationen zum Benutzer", DiscordColor.Blue, fields, url: playerSummary.Data.ProfileUrl, imageUrl: playerSummary.Data.AvatarFullUrl))
                   .WithReply(ctx.Message.Id, true)
                   .SendAsync(ctx.Channel);
-          
+
             }
         }
     }

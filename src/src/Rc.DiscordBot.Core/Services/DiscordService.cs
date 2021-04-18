@@ -3,7 +3,6 @@ using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
 using System;
 using System.Collections.Generic;
@@ -95,7 +94,7 @@ namespace Rc.DiscordBot.Services
 
                 foreach (var channel in socketGuild.Channels)
                 {
-                    if(channel.Value.Type == ChannelType.Text && string.Equals(channel.Value.Name, discordServer.Channel, StringComparison.OrdinalIgnoreCase))
+                    if (channel.Value.Type == ChannelType.Text && string.Equals(channel.Value.Name, discordServer.Channel, StringComparison.OrdinalIgnoreCase))
                     {
                         await channel.Value.SendMessageAsync(content: text, embed: embed);
                     }
