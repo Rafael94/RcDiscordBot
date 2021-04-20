@@ -6,7 +6,9 @@ using Rc.DiscordBot.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -69,6 +71,50 @@ namespace Rc.DiscordBot.Modules
 
             await new DiscordMessageBuilder()
                   .WithContent($"Der Name wurde von {oldName} zu {name} geändert")
+                  .WithReply(ctx.Message.Id, true)
+                  .SendAsync(ctx.Channel);
+        }
+
+        [RequireOwner]
+        [Command("avatar")]
+        [Aliases("setavatar", "pfp", "photo")]
+        [Description("Bot Bild setzen")]
+        public async Task SetBotAvatar(CommandContext ctx,
+         [Description("Bild Url (JPG, PNG, IMG)")]
+            string url)
+        {
+            var stream = new MemoryStream();
+            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri) &&
+                (!url.EndsWith(".img") || !url.EndsWith(".png") || !url.EndsWith(".jpg")))
+            {
+                await new DiscordMessageBuilder()
+                    .WithEmbed(EmbedHandler.CreateErrorEmbed("Bot", $"Ungültige Url. Url muss mit .jpg, .png oder .img enden"))
+                    .WithReply(ctx.Message.Id, true)
+                    .SendAsync(ctx.Channel);
+                return;
+            }
+            else
+            {
+                using var client = new WebClient();
+                var results = client.DownloadData(uri!);
+                stream.Write(results, 0, results.Length);
+                stream.Position = 0;
+            }
+
+            if (stream.Length <= 0)
+            {
+                await new DiscordMessageBuilder()
+                     .WithEmbed(EmbedHandler.CreateErrorEmbed("Bot", $"Bild konnte nicht heruntergeladen werden"))
+                     .WithReply(ctx.Message.Id, true)
+                     .SendAsync(ctx.Channel);
+                return;
+            }
+
+
+            await ctx.Client.UpdateCurrentUserAsync(avatar: stream);
+
+            await new DiscordMessageBuilder()
+                  .WithContent($"Avatar wurde aktualisiert")
                   .WithReply(ctx.Message.Id, true)
                   .SendAsync(ctx.Channel);
         }
