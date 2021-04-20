@@ -9,6 +9,7 @@ using Rc.DiscordBot.Handlers;
 using Rc.DiscordBot.Models;
 using Rc.DiscordBot.Services;
 using System;
+using System.Reflection;
 
 namespace Rc.DiscordBot
 {
@@ -18,6 +19,8 @@ namespace Rc.DiscordBot
         {
             // Konfigurations
             services.Configure<BotConfig>(options => hostContext.Configuration.GetSection("Discord").Bind(options));
+
+            services.PostConfigure<CommandHandler>((commandHandler) => commandHandler.Assemblies.Add(Assembly.GetExecutingAssembly()));
 
             services.AddSingleton<DiscordService>();
             services.AddSingleton((serviceProvider) =>

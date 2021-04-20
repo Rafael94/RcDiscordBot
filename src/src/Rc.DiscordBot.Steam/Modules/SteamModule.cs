@@ -33,6 +33,7 @@ namespace Rc.DiscordBot.Modules
             [Description("Listet die hinterlege News auf")]
             public async Task GetNewsListAsync(CommandContext ctx)
             {
+                await ctx.TriggerTypingAsync();
                 List<DiscordField>? fileds = new();
 
                 for (int i = 0; i < _steamConfig.News.Count; i++)
@@ -67,6 +68,7 @@ namespace Rc.DiscordBot.Modules
             [Description("Listet Spieleinformationen auf")]
             public async Task GetNewsListAsync(CommandContext ctx, uint gameId)
             {
+                await ctx.TriggerTypingAsync();
                 var gameDetails = await _steamStore.GetStoreAppDetailsAsync(gameId);
 
                 if (gameDetails == null)
@@ -112,7 +114,7 @@ namespace Rc.DiscordBot.Modules
             [Description("Gibt die AppId des Spiels zurück (Maximal 15 Einträge)")]
             public async Task GetFindAppIdAsync(CommandContext ctx, [RemainingText] string name)
             {
-
+                await ctx.TriggerTypingAsync();
                 var steamInterface = _steamWebInterfaceFactory.CreateSteamWebInterface<SteamApps>(new HttpClient());
                 var games = await steamInterface.GetAppListAsync();
                 List<DiscordField> fileds = new();
@@ -150,6 +152,7 @@ namespace Rc.DiscordBot.Modules
             [Command("info")]
             public async Task GetNewsListAsync(CommandContext ctx, ulong userId)
             {
+                await ctx.TriggerTypingAsync();
                 var steamInterface = _steamWebInterfaceFactory.CreateSteamWebInterface<SteamUser>(new HttpClient());
                 var playerSummary = await steamInterface.GetPlayerSummaryAsync(userId);
 

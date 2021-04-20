@@ -32,6 +32,7 @@ namespace Rc.DiscordBot.Modules
         [Command("join")]
         public async Task JoinAsync(CommandContext ctx)
         {
+            await ctx.TriggerTypingAsync();
             if (ctx.Member.VoiceState == null)
             {
                 await new DiscordMessageBuilder()
@@ -64,6 +65,7 @@ namespace Rc.DiscordBot.Modules
         [Description("Den Bot zum aktuellen Channel")]
         public async Task JoinAsync(CommandContext ctx, DiscordChannel channel)
         {
+            await ctx.TriggerTypingAsync();
             if (channel.Type != ChannelType.Voice)
             {
                 await new DiscordMessageBuilder()
@@ -84,6 +86,7 @@ namespace Rc.DiscordBot.Modules
         [Command("leave")]
         public async Task LeaveAsync(CommandContext ctx)
         {
+            await ctx.TriggerTypingAsync();
             var player = _audioService.Value.GetPlayer(ctx.Guild.Id);
 
             if (player == null)
@@ -105,6 +108,7 @@ namespace Rc.DiscordBot.Modules
         [Command("stop")]
         public async Task StopAsync(CommandContext ctx)
         {
+            await ctx.TriggerTypingAsync();
             var player = _audioService.Value.GetPlayer(ctx.Guild.Id);
 
             if (player == null)
@@ -126,6 +130,7 @@ namespace Rc.DiscordBot.Modules
         [Command("play")]
         public async Task PlayAsync(CommandContext ctx, [RemainingText] string search)
         {
+            await ctx.TriggerTypingAsync();
             var player = _audioService.Value.GetPlayer<QueuedLavalinkPlayer>(ctx.Guild.Id);
 
             if (player == null)
@@ -225,6 +230,7 @@ namespace Rc.DiscordBot.Modules
         [Command("pause")]
         public async Task PauseAsync(CommandContext ctx)
         {
+            await ctx.TriggerTypingAsync();
             var player = _audioService.Value.GetPlayer<QueuedLavalinkPlayer>(ctx.Guild.Id);
 
             if (player == null)
@@ -246,6 +252,7 @@ namespace Rc.DiscordBot.Modules
         [Command("resume")]
         public async Task ResumeAsync(CommandContext ctx)
         {
+            await ctx.TriggerTypingAsync();
             var player = _audioService.Value.GetPlayer<QueuedLavalinkPlayer>(ctx.Guild.Id);
 
             if (player == null)
@@ -267,6 +274,7 @@ namespace Rc.DiscordBot.Modules
         [Command("volume")]
         public async Task VolumeAsync(CommandContext ctx, float volume)
         {
+            await ctx.TriggerTypingAsync();
             var player = _audioService.Value.GetPlayer<QueuedLavalinkPlayer>(ctx.Guild.Id);
 
             if (player == null)
@@ -297,6 +305,7 @@ namespace Rc.DiscordBot.Modules
         [Command("ListStreams")]
         public async Task ListStreamsAsync(CommandContext ctx)
         {
+            await ctx.TriggerTypingAsync();
             DiscordEmbedBuilder builder = new();
 
             builder
@@ -325,6 +334,7 @@ namespace Rc.DiscordBot.Modules
         [Command("Stream")]
         public async Task PlayStreamAsync(CommandContext ctx, string stream)
         {
+            await ctx.TriggerTypingAsync();
             var player = _audioService.Value.GetPlayer<QueuedLavalinkPlayer>(ctx.Guild.Id);
 
             if (player == null)
@@ -407,7 +417,7 @@ namespace Rc.DiscordBot.Modules
         [Command("List")]
         public async Task ListAsync(CommandContext ctx)
         {
-
+            await ctx.TriggerTypingAsync();
             /* Create a string builder we can use to format how we want our list to be displayed. */
             StringBuilder? descriptionBuilder = new();
 
@@ -467,6 +477,7 @@ namespace Rc.DiscordBot.Modules
         [Command("Skip")]
         public async Task SkipTrackAsync(CommandContext ctx)
         {
+            await ctx.TriggerTypingAsync();
             var player = _audioService.Value.GetPlayer<QueuedLavalinkPlayer>(ctx.Guild.Id);
 
             if (player == null)
@@ -502,6 +513,7 @@ namespace Rc.DiscordBot.Modules
         [Command("ClearQueue")]
         public async Task ClearPlaylistAsync(CommandContext ctx)
         {
+            await ctx.TriggerTypingAsync();
             var player = _audioService.Value.GetPlayer<QueuedLavalinkPlayer>(ctx.Guild.Id);
 
             if (player == null)
