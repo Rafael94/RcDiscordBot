@@ -37,7 +37,7 @@ namespace Rc.DiscordBot.Steam
 
             services.AddSingleton((IServiceProvider services) =>
             {
-                MapperConfiguration? mapperConfig = new MapperConfiguration(config =>
+                MapperConfiguration? mapperConfig = new(config =>
                 {
                     config.AddProfile<SteamStoreProfile>();
                 });

@@ -50,14 +50,14 @@ namespace Rc.DiscordBot
             {
                 return Task.Factory.StartNew(async () =>
                 {
-                    var player = _audioService.GetPlayer<QueuedLavalinkPlayer>(args.Guild.Id);
+                    QueuedLavalinkPlayer? player = _audioService.GetPlayer<QueuedLavalinkPlayer>(args.Guild.Id);
 
                     if (player == null)
                     {
                         return;
                     }
 
-                    var memberCount = args.Channel.Users.Count();
+                    int memberCount = args.Channel.Users.Count();
                     // 1 => Nur der Bot befindet sich im Channel
                     if (memberCount == 1)
                     {
@@ -84,7 +84,7 @@ namespace Rc.DiscordBot
         {
             static async Task DisconnectPlayersAsync(IReadOnlyList<LavalinkPlayer> players)
             {
-                foreach (var player in players)
+                foreach (LavalinkPlayer? player in players)
                 {
                     try
                     {

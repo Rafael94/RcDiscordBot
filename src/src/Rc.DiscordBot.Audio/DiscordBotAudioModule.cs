@@ -24,7 +24,7 @@ namespace Rc.DiscordBot
                 .AddSingleton<IDiscordClientWrapper, DiscordClientWrapper>()
                 .AddSingleton((services) =>
                 {
-                    var config = services.GetRequiredService<IOptions<LavaConfig>>().Value;
+                    LavaConfig? config = services.GetRequiredService<IOptions<LavaConfig>>().Value;
 
                     return new LavalinkNodeOptions
                     {

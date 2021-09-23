@@ -22,14 +22,14 @@ namespace Rc.DiscordBot.Modules
     {
         private readonly Lazy<IAudioService> _audioService;
         private readonly AudioConfig _audioConfig;
-        private QueuedLavalinkPlayer _player= default!;
+        private QueuedLavalinkPlayer _player = default!;
 
         public AudioModule(Lazy<IAudioService> audioService, IOptions<AudioConfig> audioConfig)
         {
             _audioService = audioService;
             _audioConfig = audioConfig.Value;
         }
-        public async override Task BeforeExecutionAsync(CommandContext ctx)
+        public override async Task BeforeExecutionAsync(CommandContext ctx)
         {
             if (string.Equals(ctx.Command.Name, "join", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(ctx.Command.Name, "ListStreams", StringComparison.OrdinalIgnoreCase))
@@ -38,14 +38,14 @@ namespace Rc.DiscordBot.Modules
             }
 
             // Check that the user is in a voice channel
-            var channel = ctx.Member.VoiceState?.Channel;
+            DiscordChannel? channel = ctx.Member.VoiceState?.Channel;
             if (channel == null)
             {
                 await ctx.RespondAsync("Sie befinden sich in keinem Sprackchannel.").ConfigureAwait(false);
                 return;
             }
 
-            var userState = ctx.Guild.CurrentMember?.VoiceState?.Channel;
+            DiscordChannel? userState = ctx.Guild.CurrentMember?.VoiceState?.Channel;
             if (userState != null && channel != userState)
             {
                 await new DiscordMessageBuilder()
@@ -85,7 +85,7 @@ namespace Rc.DiscordBot.Modules
                 return;
             }
 
-            var channel = ctx.Member.VoiceState.Channel;
+            DiscordChannel? channel = ctx.Member.VoiceState.Channel;
 
             if (channel.Type != ChannelType.Voice)
             {
@@ -195,7 +195,7 @@ namespace Rc.DiscordBot.Modules
                 return;
             }
 
-            var track = tracks.First();
+            LavalinkTrack? track = tracks.First();
             List<DiscordField> fields = new()
             {
                 new DiscordField("Channel", ctx.Guild.Channels[_player.VoiceChannelId!.Value].Name, true),
@@ -203,16 +203,16 @@ namespace Rc.DiscordBot.Modules
             };
 
             DiscordAuthor author = new(track.Author);
-            var isPlayList = tracks.Count > 1 && search.StartsWith("http");
+            bool isPlayList = tracks.Count > 1 && search.StartsWith("http");
             if (isPlayList)
             {
                 fields.Add(new DiscordField("Playlist", "Yes"));
                 fields.Add(new DiscordField("Tracks", tracks.Count.ToString()));
             }
 
-            var trackQueue = await _player.PlayAsync(track);
+            int trackQueue = await _player.PlayAsync(track);
 
-            var mgsBUilder = new DiscordMessageBuilder()
+            DiscordMessageBuilder? mgsBUilder = new DiscordMessageBuilder()
                    .WithReply(ctx.Message.Id, true);
 
             if (trackQueue == 0)
@@ -223,7 +223,7 @@ namespace Rc.DiscordBot.Modules
             {
                 TimeSpan estimatedTime = _player.CurrentTrack!.Duration - _player.CurrentTrack.Position;
 
-                foreach (var queuedTrack in _player.Queue)
+                foreach (LavalinkTrack? queuedTrack in _player.Queue)
                 {
                     estimatedTime += queuedTrack.Duration;
                 }
@@ -240,7 +240,7 @@ namespace Rc.DiscordBot.Modules
                 }
             }
 
-            for (var i = 1; i < tracks.Count; i++)
+            for (int i = 1; i < tracks.Count; i++)
             {
                 await _player.PlayAsync(tracks[i]);
             }
@@ -382,7 +382,7 @@ namespace Rc.DiscordBot.Modules
                 return;
             }
 
-            var track = await _audioService.Value.GetTrackAsync(audioStream.Url, SearchMode.None);
+            LavalinkTrack? track = await _audioService.Value.GetTrackAsync(audioStream.Url, SearchMode.None);
 
             //If we couldn't find anything, tell the user.
             if (track == null)
@@ -395,7 +395,7 @@ namespace Rc.DiscordBot.Modules
                 return;
             }
 
-            var queueCount = await _player.PlayAsync(track);
+            int queueCount = await _player.PlayAsync(track);
 
             if (queueCount > 0)
             {
@@ -451,7 +451,7 @@ namespace Rc.DiscordBot.Modules
                      *  Next Add the Track title and the url however make use of Discords Markdown feature to display everything neatly.
                         This trackNum variable is used to display the number in which the song is in place. (Start at 2 because we're including the current song.*/
                     int trackNum = 2;
-                    foreach (var track in _player.Queue)
+                    foreach (LavalinkTrack? track in _player.Queue)
                     {
                         descriptionBuilder.Append($"{trackNum}: [{track.Title}]({track.Source})\n");
                         trackNum++;
@@ -492,7 +492,7 @@ namespace Rc.DiscordBot.Modules
             }
             else
             {
-                var title = _player.CurrentTrack!.Title;
+                string? title = _player.CurrentTrack!.Title;
                 await _player.SkipAsync(1);
 
                 await new DiscordMessageBuilder()

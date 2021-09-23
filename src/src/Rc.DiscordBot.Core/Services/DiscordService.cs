@@ -19,8 +19,6 @@ namespace Rc.DiscordBot.Services
         private readonly ILogger<DiscordService> _logger;
         public DiscordClient Client { get; init; }
 
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Nicht verwendete Parameter entfernen", Justification = "<Ausstehend>")]
         public DiscordService(IOptions<BotConfig> botConfigOptions, DiscordClient client, ILogger<DiscordService> logger)
         {
             _botConfig = botConfigOptions.Value;
@@ -69,7 +67,7 @@ namespace Rc.DiscordBot.Services
 
         public async Task SendMessageAsync(IEnumerable<MessageSendToDiscordServer> discordServers, string? text = null, DiscordEmbed? embed = null)
         {
-            var servers = Client.Guilds;
+            IReadOnlyDictionary<ulong, DiscordGuild>? servers = Client.Guilds;
 
             // Server durchlaufen die Benachrichtigt werden sollen
             foreach (MessageSendToDiscordServer? discordServer in discordServers)
@@ -77,7 +75,7 @@ namespace Rc.DiscordBot.Services
                 DiscordGuild? socketGuild = null;
 
                 // Discord Server ID ermitteln
-                foreach (var server in servers)
+                foreach (KeyValuePair<ulong, DiscordGuild> server in servers)
                 {
                     if (string.Equals(server.Value.Name, discordServer.Name, StringComparison.OrdinalIgnoreCase))
                     {
@@ -92,7 +90,7 @@ namespace Rc.DiscordBot.Services
                     continue;
                 }
 
-                foreach (var channel in socketGuild.Channels)
+                foreach (KeyValuePair<ulong, DiscordChannel> channel in socketGuild.Channels)
                 {
                     if (channel.Value.Type == ChannelType.Text && string.Equals(channel.Value.Name, discordServer.Channel, StringComparison.OrdinalIgnoreCase))
                     {

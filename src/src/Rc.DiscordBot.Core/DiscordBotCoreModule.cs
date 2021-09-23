@@ -25,23 +25,23 @@ namespace Rc.DiscordBot
             services.AddSingleton<DiscordService>();
             services.AddSingleton((serviceProvider) =>
             {
-                var config = serviceProvider.GetRequiredService<IOptions<BotConfig>>().Value;
-                var handler = serviceProvider.GetRequiredService<IOptions<CommandHandler>>().Value;
+                BotConfig? config = serviceProvider.GetRequiredService<IOptions<BotConfig>>().Value;
+                CommandHandler? handler = serviceProvider.GetRequiredService<IOptions<CommandHandler>>().Value;
 
-                var client = new DiscordClient(new DiscordConfiguration()
+                DiscordClient? client = new(new DiscordConfiguration()
                 {
                     Token = config.BotToken,
                     TokenType = TokenType.Bot,
                     Intents = DiscordIntents.AllUnprivileged,
                 });
 
-                var commands = client.UseCommandsNext(new CommandsNextConfiguration()
+                CommandsNextExtension? commands = client.UseCommandsNext(new CommandsNextConfiguration()
                 {
                     StringPrefixes = new[] { config.Prefix },
                     Services = serviceProvider
                 });
 
-                foreach (var assembly in handler.Assemblies)
+                foreach (Assembly? assembly in handler.Assemblies)
                 {
                     commands.RegisterCommands(assembly);
                 }

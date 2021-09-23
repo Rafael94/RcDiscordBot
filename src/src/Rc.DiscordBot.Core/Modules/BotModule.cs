@@ -6,10 +6,9 @@ using Rc.DiscordBot.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Rc.DiscordBot.Modules
@@ -19,11 +18,12 @@ namespace Rc.DiscordBot.Modules
         [Command("info")]
         [Aliases("about")]
         [Description("Infos über diesen Bot")]
+        [SuppressMessage("Performance", "CA1822:Member als statisch markieren", Justification = "<Ausstehend>")]
         public async Task BotInfoAsync(CommandContext ctx)
         {
             await ctx.TriggerTypingAsync();
 
-            var uptime = DateTime.UtcNow - Process.GetCurrentProcess().StartTime.ToUniversalTime();
+            TimeSpan uptime = DateTime.UtcNow - Process.GetCurrentProcess().StartTime.ToUniversalTime();
             List<DiscordField> fields = new()
             {
                 new(":clock1: Laufzeit", $"{uptime.TotalDays:00} days {uptime.Hours:00}:{uptime.Minutes:00}:{uptime.Seconds:00}", true),
@@ -38,6 +38,7 @@ namespace Rc.DiscordBot.Modules
 
         [Command("ping")]
         [Aliases("pong")]
+        [SuppressMessage("Performance", "CA1822:Member als statisch markieren", Justification = "<Ausstehend>")]
         public async Task PingBotAsync(CommandContext ctx)
         {
             await ctx.TriggerTypingAsync();
@@ -52,6 +53,7 @@ namespace Rc.DiscordBot.Modules
         [Command("username")]
         [Aliases("setusername", "name", "setname", "nickname", "nick")]
         [Description("Set Bots's username.")]
+        [SuppressMessage("Performance", "CA1822:Member als statisch markieren", Justification = "<Ausstehend>")]
         public async Task SetBotUsernameAsync(CommandContext ctx,
           [Description("Der neue Name für den Bot.")] [RemainingText]
             string name)
@@ -66,7 +68,7 @@ namespace Rc.DiscordBot.Modules
                 return;
             }
 
-            var oldName = ctx.Client.CurrentUser.Username;
+            string? oldName = ctx.Client.CurrentUser.Username;
             await ctx.Client.UpdateCurrentUserAsync(name);
 
             await new DiscordMessageBuilder()
@@ -79,11 +81,12 @@ namespace Rc.DiscordBot.Modules
         [Command("avatar")]
         [Aliases("setavatar", "pfp", "photo")]
         [Description("Bot Bild setzen")]
+        [SuppressMessage("Performance", "CA1822:Member als statisch markieren", Justification = "<Ausstehend>")]
         public async Task SetBotAvatar(CommandContext ctx,
          [Description("Bild Url (JPG, PNG, IMG)")]
             string url)
         {
-            var stream = new MemoryStream();
+            MemoryStream? stream = new();
             if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri) &&
                 (!url.EndsWith(".img") || !url.EndsWith(".png") || !url.EndsWith(".jpg")))
             {
@@ -95,8 +98,8 @@ namespace Rc.DiscordBot.Modules
             }
             else
             {
-                using var client = new WebClient();
-                var results = client.DownloadData(uri!);
+                using WebClient? client = new();
+                byte[]? results = client.DownloadData(uri!);
                 stream.Write(results, 0, results.Length);
                 stream.Position = 0;
             }

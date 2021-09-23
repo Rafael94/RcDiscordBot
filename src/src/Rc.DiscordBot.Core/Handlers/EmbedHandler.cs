@@ -21,7 +21,7 @@ namespace Rc.DiscordBot.Handlers
             string? imageUrl = null)
         {
 
-            var builder = new DiscordEmbedBuilder()
+            DiscordEmbedBuilder? builder = new DiscordEmbedBuilder()
                 .WithTitle(title)
                 .WithCustomDescription(description)
                 .WithColor(color)
@@ -68,7 +68,7 @@ namespace Rc.DiscordBot.Handlers
 
         public static DiscordEmbedBuilder AddFields(this DiscordEmbedBuilder embedBuilder, IEnumerable<DiscordField> fields)
         {
-            foreach (var field in fields)
+            foreach (DiscordField? field in fields)
             {
                 embedBuilder.AddField(field.Name, field.Value, field.Inline);
             }

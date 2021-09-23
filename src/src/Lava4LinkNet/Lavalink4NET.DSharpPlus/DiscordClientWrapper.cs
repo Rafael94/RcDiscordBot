@@ -106,10 +106,10 @@ namespace Lavalink4NET.DSharpPlus
         {
             EnsureNotDisposed();
 
-            var guild = await _client.GetGuildAsync(guildId)
+            global::DSharpPlus.Entities.DiscordGuild? guild = await _client.GetGuildAsync(guildId)
                 ?? throw new ArgumentException("Invalid or inaccessible guild: " + guildId, nameof(guildId));
 
-            var channel = guild.GetChannel(voiceChannelId)
+            global::DSharpPlus.Entities.DiscordChannel? channel = guild.GetChannel(voiceChannelId)
                 ?? throw new ArgumentException("Invalid or inaccessible voice channel: " + voiceChannelId, nameof(voiceChannelId));
 
             return channel.Users.Select(s => s.Id);
@@ -121,7 +121,7 @@ namespace Lavalink4NET.DSharpPlus
         {
             EnsureNotDisposed();
 
-            var startTime = DateTimeOffset.UtcNow;
+            DateTimeOffset startTime = DateTimeOffset.UtcNow;
 
             // await until current user arrived
             while (_client.CurrentUser is null)
@@ -143,13 +143,13 @@ namespace Lavalink4NET.DSharpPlus
         {
             EnsureNotDisposed();
 
-            var payload = new JObject();
-            var data = new VoiceStateUpdatePayload(guildId, voiceChannelId, selfMute, selfDeaf);
+            JObject? payload = new();
+            VoiceStateUpdatePayload? data = new(guildId, voiceChannelId, selfMute, selfDeaf);
 
             payload.Add("op", 4);
             payload.Add("d", JObject.FromObject(data));
 
-            var message = JsonConvert.SerializeObject(payload, Formatting.None);
+            string? message = JsonConvert.SerializeObject(payload, Formatting.None);
             await _client.GetWebSocketClient().SendMessageAsync(message);
         }
 
@@ -176,7 +176,7 @@ namespace Lavalink4NET.DSharpPlus
                 return Task.CompletedTask;
             }
 
-            var args = new VoiceServer(voiceServer.Guild.Id, voiceServer.GetVoiceToken(), voiceServer.Endpoint);
+            VoiceServer? args = new(voiceServer.Guild.Id, voiceServer.GetVoiceToken(), voiceServer.Endpoint);
             return VoiceServerUpdated.InvokeAsync(this, args);
         }
 
@@ -188,10 +188,10 @@ namespace Lavalink4NET.DSharpPlus
 
             // session id is the same as the resume key so DSharpPlus should be able to give us the
             // session key in either before or after voice state
-            var sessionId = eventArgs.Before?.GetSessionId() ?? eventArgs.After.GetSessionId();
+            string? sessionId = eventArgs.Before?.GetSessionId() ?? eventArgs.After.GetSessionId();
 
             // create voice state
-            var voiceState = new VoiceState(
+            VoiceState? voiceState = new(
                 voiceChannelId: eventArgs.After?.Channel?.Id,
                 guildId: eventArgs.Guild.Id,
                 voiceSessionId: sessionId);

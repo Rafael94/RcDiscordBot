@@ -38,7 +38,7 @@ namespace Rc.DiscordBot.Modules
 
                 for (int i = 0; i < _steamConfig.News.Count; i++)
                 {
-                    var newsConfig = _steamConfig.News[i];
+                    Models.News? newsConfig = _steamConfig.News[i];
 
                     MessageSendToDiscordServer? discordServer = newsConfig.DiscordServers.Where(x => string.Equals(x.Name, ctx.Guild.Name, System.StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
@@ -69,7 +69,7 @@ namespace Rc.DiscordBot.Modules
             public async Task GetNewsListAsync(CommandContext ctx, uint gameId)
             {
                 await ctx.TriggerTypingAsync();
-                var gameDetails = await _steamStore.GetStoreAppDetailsAsync(gameId);
+                global::Steam.Models.SteamStore.StoreAppDetailsDataModel? gameDetails = await _steamStore.GetStoreAppDetailsAsync(gameId);
 
                 if (gameDetails == null)
                 {
@@ -81,9 +81,9 @@ namespace Rc.DiscordBot.Modules
                     return;
                 }
 
-                var steamInterface = _steamWebInterfaceFactory.CreateSteamWebInterface<SteamUserStats>(new HttpClient());
+                SteamUserStats? steamInterface = _steamWebInterfaceFactory.CreateSteamWebInterface<SteamUserStats>(new HttpClient());
 
-                var curentPlayerCount = await steamInterface.GetNumberOfCurrentPlayersForGameAsync(gameId);
+                ISteamWebResponse<uint>? curentPlayerCount = await steamInterface.GetNumberOfCurrentPlayersForGameAsync(gameId);
 
 
                 DiscordEmbed embed = new DiscordEmbedBuilder()
@@ -115,11 +115,11 @@ namespace Rc.DiscordBot.Modules
             public async Task GetFindAppIdAsync(CommandContext ctx, [RemainingText] string name)
             {
                 await ctx.TriggerTypingAsync();
-                var steamInterface = _steamWebInterfaceFactory.CreateSteamWebInterface<SteamApps>(new HttpClient());
-                var games = await steamInterface.GetAppListAsync();
+                SteamApps? steamInterface = _steamWebInterfaceFactory.CreateSteamWebInterface<SteamApps>(new HttpClient());
+                ISteamWebResponse<IReadOnlyCollection<global::Steam.Models.SteamAppModel>>? games = await steamInterface.GetAppListAsync();
                 List<DiscordField> fileds = new();
 
-                foreach (var game in games.Data)
+                foreach (global::Steam.Models.SteamAppModel? game in games.Data)
                 {
                     if (game.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase))
                     {
@@ -153,8 +153,8 @@ namespace Rc.DiscordBot.Modules
             public async Task GetNewsListAsync(CommandContext ctx, ulong userId)
             {
                 await ctx.TriggerTypingAsync();
-                var steamInterface = _steamWebInterfaceFactory.CreateSteamWebInterface<SteamUser>(new HttpClient());
-                var playerSummary = await steamInterface.GetPlayerSummaryAsync(userId);
+                SteamUser? steamInterface = _steamWebInterfaceFactory.CreateSteamWebInterface<SteamUser>(new HttpClient());
+                ISteamWebResponse<global::Steam.Models.SteamCommunity.PlayerSummaryModel>? playerSummary = await steamInterface.GetPlayerSummaryAsync(userId);
 
                 if (playerSummary?.Data == null)
                 {

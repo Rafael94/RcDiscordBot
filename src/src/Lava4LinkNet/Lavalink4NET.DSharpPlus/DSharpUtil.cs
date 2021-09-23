@@ -65,7 +65,9 @@ namespace Lavalink4NET.DSharpPlus
         /// <param name="voiceState">the instance</param>
         /// <returns>the "SessionId" value</returns>
         public static string GetSessionId(this DiscordVoiceState voiceState)
-            => (string)_sessionIdProperty.GetValue(voiceState);
+        {
+            return (string)_sessionIdProperty.GetValue(voiceState);
+        }
 
         /// <summary>
         ///     Gets the "VoiceToken" property value of the specified <paramref name="voiceServerUpdateEventArgs"/>.
@@ -73,12 +75,16 @@ namespace Lavalink4NET.DSharpPlus
         /// <param name="voiceServerUpdateEventArgs">the instance</param>
         /// <returns>the "VoiceToken" value</returns>
         public static string GetVoiceToken(this VoiceServerUpdateEventArgs voiceServerUpdateEventArgs)
-            => (string)_voiceTokenProperty.GetValue(voiceServerUpdateEventArgs);
+        {
+            return (string)_voiceTokenProperty.GetValue(voiceServerUpdateEventArgs);
+        }
 
         /// <summary>
         ///     Gets the internal "_webSocketClient" field value of the specified <paramref name="client"/>.
         /// </summary>
         public static IWebSocketClient GetWebSocketClient(this DiscordClient client)
-            => (IWebSocketClient)_webSocketClientField.GetValue(client);
+        {
+            return (IWebSocketClient)_webSocketClientField.GetValue(client);
+        }
     }
 }
